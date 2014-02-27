@@ -122,6 +122,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 },
                 trigger: trigger
             });
+            return datePicker;
         },
         
         /**
@@ -361,7 +362,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 zIndex: 1001
             }).render();
 
-            this._createCalendar('.add .lfr-input-date input');
+            var datePicker = this._createCalendar('.add .lfr-input-date input');
  
             var validator = new Y.FormValidator({
                 boundingBox: modal._stackNode.one('form'),
