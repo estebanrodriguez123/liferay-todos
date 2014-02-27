@@ -398,6 +398,17 @@ AUI.add('todo-portlet', function (Y, NAME) {
             modal._stackNode.one('.add-cancel').on('click', function (e) {
                 modal.hide();
             });
+            
+            /* 
+             *  If the modal is closed using the "x" at the corner, 
+             *  the datepicker has to be manually hidden 
+             */
+            modal._stackNode.one('.close:button').on('click', function (e) {      
+            	var popover = datePicker.getPopover();
+            	if (popover.get('visible')) {
+            		popover.hide();
+            	}
+            });
         },
         
         openTaskGroup: function(taskId) {
