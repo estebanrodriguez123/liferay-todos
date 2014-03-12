@@ -96,21 +96,22 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     disabledChange: function(event) {
 
                     },
-                    // remove validation which fails when the value is changed through javascript
-                    // and not by the user, as in this case
+                    selectionChange: function(event) {
+                        Y.one(trigger).set('value', event.newSelection[0]);
+                    }
                 },
                 after: {
                     selectionChange: function(event) {
-                        var group = Y.one(".lfr-input-date").get("parentNode");
+                        var group = Y.one(trigger).ancestor('.control-group');
 
-                            group.removeClass("error").addClass("success");
+                        group.removeClass("error").addClass("success");
 
-                            try {
-                                group.one(".help-inline").remove(false);
-                            }
-                            catch(e) {
+                        try {
+                            group.one(".help-inline").remove(false);
+                        }
+                        catch(e) {
 
-                            }
+                        }
                         
                     }
                 },
@@ -190,9 +191,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     rules: TASK_VALIDATION_RULES
                 });
                 button.on("click", function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    cont.all('input,textarea').each(function(n) {
+                    cont.all('input:not(.edit-time),textarea').each(function(n) {
                         n.simulate('blur'); 
                     });
                     if (cont.all('.error').size() == 0) {
@@ -210,6 +209,8 @@ AUI.add('todo-portlet', function (Y, NAME) {
                             });
                         });
                     }
+                    e.preventDefault();
+                    e.stopPropagation();
                 });
             });
 
@@ -365,7 +366,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
             var datePicker = this._createCalendar('.add .lfr-input-date input');
  
             var validator = new Y.FormValidator({
-                boundingBox: modal._stackNode.one('form'),
+                boundingBox: modal.get('boundingBox').one('form'),
                 rules: TASK_VALIDATION_RULES
             });
             
@@ -374,21 +375,23 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 modal.show();
             });
 
-            modal._stackNode.one('.add-submit').on('click', function (e) {
+            modal.get('boundingBox').one('.add-submit').on('click', function (e) {
                 /* trigger validator */
-                modal._stackNode.all('input:not(.edit-time),textarea').each(function(n) {
+                modal.get('boundingBox').all('input:not(.edit-time),textarea').each(function(n) {
                     n.simulate('blur'); 
                 });
-                if (modal._stackNode.all('.error').size() == 0) {
-                    var title = modal._stackNode.one('.add-title').get('value');
-                    var description = modal._stackNode.one('.add-description').get('value');
-                    var date = modal._stackNode.one('.lfr-input-date input').get('value');
+                if (modal.get('boundingBox').all('.error').size() == 0) {
+                    var title = modal.get('boundingBox').one('.add-title').get('value');
+                    var description = modal.get('boundingBox').one('.add-description').get('value');
+                    var date = modal.get('boundingBox').one('.lfr-input-date input').get('value');
                     date = new Date(date);
+                    modal.get('boundingBox').one('.todo-portlet-loader').toggleClass('visible');
                     me.addTaskCall({name: title, description: description, day: (date.getDate() + 1), month: date.getMonth(), year: date.getFullYear()}, function(data) {
+                        modal.get('boundingBox').one('.todo-portlet-loader').toggleClass('visible');
                         me.updateTaskListUI(function() {
                             me.openTaskGroup(data.taskId);
                         });
-                        modal._stackNode.one('form').reset();
+                        modal.get('boundingBox').one('form').reset();
                         modal.hide();
                     });
                     e.preventDefault();
@@ -396,7 +399,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 }
             });
 
-            modal._stackNode.one('.add-cancel').on('click', function (e) {
+            modal.get('boundingBox').one('.add-cancel').on('click', function (e) {
                 modal.hide();
             });
             
@@ -404,7 +407,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
              *  If the modal is closed using the "x" at the corner, 
              *  the datepicker has to be manually hidden 
              */
-            modal._stackNode.one('.close:button').on('click', function (e) {      
+            modal.get('boundingBox').one('.close:button').on('click', function (e) {      
             	var popover = datePicker.getPopover();
             	if (popover.get('visible')) {
             		popover.hide();

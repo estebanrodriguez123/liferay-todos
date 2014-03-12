@@ -46,7 +46,7 @@ defaultValueDate.setTime(new Date());
        
         <button class="btn add-submit"><liferay-ui:message key="edit-task-submit" /></button>
         <button class="btn add-cancel"><liferay-ui:message key="edit-task-cancel" /></button>
-
+        <div class="todo-portlet-loader"></div>
     </form>
 </div>
 </script>

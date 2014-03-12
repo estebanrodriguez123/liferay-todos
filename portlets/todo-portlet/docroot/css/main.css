@@ -223,3 +223,15 @@
 .default-visible ul {
     display: block;
 }
+
+.todo-portlet-loader {
+    visibility: hidden;
+    background: url(../images/loading_animation.gif);
+    width: 32px;
+    height: 32px;
+    float: right;
+}
+
+.todo-portlet-loader.visible {
+    visibility: visible;
+}

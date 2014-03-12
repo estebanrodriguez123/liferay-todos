@@ -47,7 +47,7 @@
             <div class="control-group">
                 <label class="control-label" for="time"><liferay-ui:message key="edit-task-date" /></label>
                 <div class="lfr-input-date controls">
-                    <input id="taskCal{taskId}" name="time" type="{dateFieldType}" class="edit-time field-required" value="{date}"></input>
+                    <input id="taskCal{taskId}" name="time" type="{dateFieldType}" class="edit-time" value="{date}"></input>
                 </div>
             </div>
 
