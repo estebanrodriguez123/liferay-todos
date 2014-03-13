@@ -95,7 +95,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 on: {
                     disabledChange: function(event) {
 
-                    },
+                    }
                     // remove validation which fails when the value is changed through javascript
                     // and not by the user, as in this case
                 },
@@ -264,6 +264,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
          */
         executeAjax: function(configuration, callback, testResponseUrl) {
             var url = testResponseUrl ? testResponseUrl : this.get('resourceUrl');
+            configuration.data.ajax_timestamp = new Date().getTime();
             Y.io.request(url, {
                 method: configuration.method,
                 data: configuration.data,
@@ -365,7 +366,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
             var datePicker = this._createCalendar('.add .lfr-input-date input');
  
             var validator = new Y.FormValidator({
-                boundingBox: modal._stackNode.one('form'),
+                boundingBox: modal.get('boundingBox').one('form'),
                 rules: TASK_VALIDATION_RULES
             });
             
@@ -374,29 +375,37 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 modal.show();
             });
 
-            modal._stackNode.one('.add-submit').on('click', function (e) {
+            modal.get('boundingBox').one('.add-submit').on('click', function (e) {
                 /* trigger validator */
-                modal._stackNode.all('input:not(.edit-time),textarea').each(function(n) {
+                modal.get('boundingBox').all('input:not(.edit-time),textarea').each(function(n) {
                     n.simulate('blur'); 
                 });
-                if (modal._stackNode.all('.error').size() == 0) {
-                    var title = modal._stackNode.one('.add-title').get('value');
-                    var description = modal._stackNode.one('.add-description').get('value');
-                    var date = modal._stackNode.one('.lfr-input-date input').get('value');
+                var title = modal.get('boundingBox').one('.add-title').get('value');
+                var description = modal.get('boundingBox').one('.add-description').get('value');
+                var date = modal.get('boundingBox').one('.lfr-input-date input').get('value');
+                
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (modal.get('boundingBox').all('.error').size() == 0 && Y.Lang.trim(title) != '' && 
+                        Y.Lang.trim(description) != '' && Y.Lang.trim(date) != '') {
                     date = new Date(date);
+                    modal.get('boundingBox').one('.todo-portlet-loader').toggleClass('visible');
+                    modal.get('boundingBox').one('.add-submit').setAttribute('disabled', 'true');
                     me.addTaskCall({name: title, description: description, day: (date.getDate() + 1), month: date.getMonth(), year: date.getFullYear()}, function(data) {
+                        modal.get('boundingBox').one('.todo-portlet-loader').toggleClass('visible');
+                        modal.get('boundingBox').one('.add-submit').removeAttribute('disabled');
                         me.updateTaskListUI(function() {
                             me.openTaskGroup(data.taskId);
                         });
-                        modal._stackNode.one('form').reset();
+                        modal.get('boundingBox').one('form').reset();
                         modal.hide();
                     });
-                    e.preventDefault();
-                    e.stopPropagation();
+                    
                 }
             });
 
-            modal._stackNode.one('.add-cancel').on('click', function (e) {
+            modal.get('boundingBox').one('.add-cancel').on('click', function (e) {
                 modal.hide();
             });
             
@@ -404,7 +413,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
              *  If the modal is closed using the "x" at the corner, 
              *  the datepicker has to be manually hidden 
              */
-            modal._stackNode.one('.close:button').on('click', function (e) {      
+            modal.get('boundingBox').one('.close:button').on('click', function (e) {      
             	var popover = datePicker.getPopover();
             	if (popover.get('visible')) {
             		popover.hide();
