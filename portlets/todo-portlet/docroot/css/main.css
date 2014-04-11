@@ -117,7 +117,7 @@
     color: white
 }
 
-.todo-portlet .btn.activity-finished,.btn.activity-undo {
+.todo-portlet .btn.activity-finished,.btn.activity-undo,.btn.activity-undo.icon-check {
     background-image: none;
     border: 0;
     color: #385;
