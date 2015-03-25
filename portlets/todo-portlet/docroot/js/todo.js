@@ -192,9 +192,6 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 button.on("click", function (e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    cont.all('input,textarea').each(function(n) {
-                        n.simulate('blur'); 
-                    });
                     if (cont.all('.error').size() == 0) {
                         var element = me.getMembers(this.get("parentNode").get("parentNode").get("parentNode"));
                         var id = element.edit.one('input[type="hidden"]').get('value');
@@ -377,9 +374,6 @@ AUI.add('todo-portlet', function (Y, NAME) {
 
             modal.get('boundingBox').one('.add-submit').on('click', function (e) {
                 /* trigger validator */
-                modal.get('boundingBox').all('input:not(.edit-time),textarea').each(function(n) {
-                    n.simulate('blur'); 
-                });
                 var title = modal.get('boundingBox').one('.add-title').get('value');
                 var description = modal.get('boundingBox').one('.add-description').get('value');
                 var date = modal.get('boundingBox').one('.lfr-input-date input').get('value');
