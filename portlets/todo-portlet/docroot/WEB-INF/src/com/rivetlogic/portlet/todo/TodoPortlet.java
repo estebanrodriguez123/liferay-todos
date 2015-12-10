@@ -17,6 +17,18 @@
 
 package com.rivetlogic.portlet.todo;
 
+import com.liferay.calendar.model.CalendarBooking;
+import com.liferay.calendar.model.CalendarBookingConstants;
+import com.liferay.calendar.model.CalendarResource;
+import com.liferay.calendar.service.CalendarBookingLocalServiceUtil;
+import com.liferay.calendar.service.CalendarLocalServiceUtil;
+import com.liferay.calendar.service.CalendarResourceLocalServiceUtil;
+import com.liferay.calendar.service.persistence.CalendarBookingFinderUtil;
+import com.liferay.calendar.service.persistence.CalendarBookingUtil;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
@@ -24,6 +36,10 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.model.User;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextFactory;
+import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
@@ -37,6 +53,10 @@ import com.rivetlogic.portlet.todo.validator.TodoValidator;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Locale;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletResponse;
@@ -124,7 +144,10 @@ public class TodoPortlet extends MVCPortlet {
         Task task = createTaskFromRequest(request);
         if (TodoValidator.validateNewTask(task)) {
             try {
-                task = TaskLocalServiceUtil.createTask(task);
+            	task = TaskLocalServiceUtil.createTask(task);
+            	// TODO: update task model to include calendar id and a flag to optionally add it to liferay calendar
+            	//addToCalendar(request, task);
+            	
                 jsonObject.put(COMMAND_SUCCESS, true);
                 jsonObject.put(TasksBean.JSON_TASK_DATA_ID, task.getTaskId());
             } catch (Exception e) {
@@ -193,5 +216,20 @@ public class TodoPortlet extends MVCPortlet {
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, day);
         return calendar;
+    }
+    
+    private void addToCalendar(HttpServletRequest request, Task task) throws PortalException, SystemException {
+
+        Map<Locale, String> titleMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		
+		titleMap.put(ServiceContextFactory.getInstance(request).getLocale(), task.getName());
+		descriptionMap.put(ServiceContextFactory.getInstance(request).getLocale(), task.getDescription());
+		
+        CalendarBookingLocalServiceUtil.addCalendarBooking(PortalUtil.getUserId(request),
+        	11116, new long[]{}, 0l, titleMap, descriptionMap,
+			StringPool.BLANK, task.getDate().getTime(),
+			task.getDate().getTime(), true, "", 0l, "", 0l, "",
+			ServiceContextFactory.getInstance(request));
     }
 }

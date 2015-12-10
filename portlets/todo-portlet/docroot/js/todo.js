@@ -249,6 +249,15 @@ AUI.add('todo-portlet', function (Y, NAME) {
             });
         },
         
+        getCalendarId: function(modal) {
+        	var select = modal.get('boundingBox').one('.select-calendar');
+        	if (select.attr("disabled")) {
+        		return undefined;
+        	} else {
+        		return select.val();
+        	}
+        },
+        
         /**
          * Common ajax wrapper
          * 
@@ -377,6 +386,9 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 var title = modal.get('boundingBox').one('.add-title').get('value');
                 var description = modal.get('boundingBox').one('.add-description').get('value');
                 var date = modal.get('boundingBox').one('.lfr-input-date input').get('value');
+                var calendarId = me.getCalendarId(modal);
+                
+                console.log("calendar id ", calendarId);
                 
                 e.preventDefault();
                 e.stopPropagation();
@@ -411,6 +423,15 @@ AUI.add('todo-portlet', function (Y, NAME) {
             	var popover = datePicker.getPopover();
             	if (popover.get('visible')) {
             		popover.hide();
+            	}
+            });
+            
+            modal.get('boundingBox').one('.chk-calendar').on('change', function (e) {
+            	var select = modal.get('boundingBox').one('.select-calendar');
+            	if (select.attr("disabled")) {
+            		select.attr("disabled", false)
+            	} else {
+            		select.attr("disabled", "disabled");
             	}
             });
         },
