@@ -17,6 +17,7 @@
  */
 --%>
 
+
 <script id="<portlet:namespace/>task-list-item-template" type="text/x-html-template">
 <li id="task-{taskId}" class="{done}">
     <div class="activity">
@@ -50,6 +51,21 @@
                     <input id="taskCal{taskId}" name="time" type="{dateFieldType}" class="edit-time field-required" value="{date}"></input>
                 </div>
             </div>
+
+			<div class="control-group">
+				<label class="add-to-calendar"><input type="checkbox" class="chk-calendar" /> <liferay-ui:message key="edit-task-add-to-calendar" /></label>
+       			<div class="controls">            
+					<select class="select-calendar">
+						<%
+						for (com.liferay.calendar.model.Calendar curCalendar : manageableCalendars) {
+						%>
+						<option value="<%= curCalendar.getCalendarId() %>"><%= HtmlUtil.escape(curCalendar.getName(locale)) %></option>
+						<%
+						}
+						%>
+					</select>			
+        		</div>
+			</div>
 
        
             <button class="btn edit-submit"><liferay-ui:message key="edit-task-submit" /></button>

@@ -28,6 +28,10 @@ AUI.add('todo-portlet', function (Y, NAME) {
             required: true
           }
     };
+    
+    var SELECT_CALENDAR = '.select-calendar';
+    var CHECKBOX_CALENDAR = '.chk-calendar';
+    
     Y.Todo = Y.Base.create('todo-portlet', Y.Base, [], {
 
         lis: null,
@@ -141,15 +145,21 @@ AUI.add('todo-portlet', function (Y, NAME) {
             this.undo = box.all(".activity-undo");
             this.inputs = box.all(".edit input, .edit button, .edit textarea");
             
-            /* initializes calendar */
+            /* initializes calendar and select */
             box.all(".tasks li").each(function(node) {
                 me._createCalendar('#' + node.one('.edit-time').get('id'));
+                
+                // TODO: load the state of the select according the calendarId of the task for now, the select
+                // is disabled by default
+                node.one(SELECT_CALENDAR).setAttribute("disabled", "disabled");
+                node.one(CHECKBOX_CALENDAR).on('change', function (event) { 
+                	me.checkHandler(event, node.one(SELECT_CALENDAR));
+                });
             });
             /** Shows edit mode when clicking on a task **/
             this.activities.each(function (activity) {
                 activity.on("click", function () {
                     var element = me.getMembers(this.get("parentNode"));
-
                     element.activity.addClass("hide");
                     element.edit.addClass("show");
                     //element.titleInput.set("value",element.title.get("text"));
@@ -249,8 +259,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
             });
         },
         
-        getCalendarId: function(modal) {
-        	var select = modal.get('boundingBox').one('.select-calendar');
+        getCalendarId: function(select) {
         	if (select.attr("disabled")) {
         		return undefined;
         	} else {
@@ -378,7 +387,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
             
             this.addButton.on('click', function (e) {
                 modal.set('width', (me.getViewport().width < LIFERAY_PHONE_MEDIA_BREAK ? (me.getViewport().width - 40) : 500));
-                modal.get('boundingBox').one('.select-calendar').setAttribute("disabled", "disabled");
+                modal.get('boundingBox').one(SELECT_CALENDAR).setAttribute("disabled", "disabled");
                 modal.show();
             });
 
@@ -387,7 +396,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 var title = modal.get('boundingBox').one('.add-title').get('value');
                 var description = modal.get('boundingBox').one('.add-description').get('value');
                 var date = modal.get('boundingBox').one('.lfr-input-date input').get('value');
-                var calendarId = me.getCalendarId(modal);
+                var calendarId = me.getCalendarId(modal.get('boundingBox').one(SELECT_CALENDAR));
                 
                 e.preventDefault();
                 e.stopPropagation();
@@ -397,7 +406,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     date = new Date(date);
                     modal.get('boundingBox').one('.todo-portlet-loader').toggleClass('visible');
                     modal.get('boundingBox').one('.add-submit').setAttribute('disabled', 'true');
-                    me.addTaskCall({name: title, description: description, day: (date.getDate() + 1), month: date.getMonth(), year: date.getFullYear()}, function(data) {
+                    me.addTaskCall({name: title, description: description, day: (date.getDate() + 1), month: date.getMonth(), year: date.getFullYear(), calendarId: calendarId}, function(data) {
                         modal.get('boundingBox').one('.todo-portlet-loader').toggleClass('visible');
                         modal.get('boundingBox').one('.add-submit').removeAttribute('disabled');
                         me.updateTaskListUI(function() {
@@ -425,14 +434,20 @@ AUI.add('todo-portlet', function (Y, NAME) {
             	}
             });
             
-            modal.get('boundingBox').one('.chk-calendar').on('change', function (e) {
-            	var select = modal.get('boundingBox').one('.select-calendar');
-            	if (select.attr("disabled")) {
-            		select.removeAttribute("disabled");
-            	} else {
-            		select.setAttribute("disabled", "disabled");
-            	}
+            modal.get('boundingBox').one(CHECKBOX_CALENDAR).on('change', function (event) {
+            	me.checkHandler(event, modal.get('boundingBox').one(SELECT_CALENDAR));
             });
+        },
+        
+        /** Handler for the checkbox to enable or disabled the calendar select **/
+        checkHandler: function (event, selectCalendar) {
+        	if (selectCalendar) {
+        		if (selectCalendar.attr("disabled")) {
+	        		selectCalendar.removeAttribute("disabled");
+	        	} else {
+	        		selectCalendar.setAttribute("disabled", "disabled");
+	        	}
+        	}
         },
         
         openTaskGroup: function(taskId) {
@@ -459,6 +474,8 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     easing: 'cubic-bezier(0, 0.1, 0, 1)'
                 }
             });
+            
+            
         },
 
 
