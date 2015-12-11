@@ -378,6 +378,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
             
             this.addButton.on('click', function (e) {
                 modal.set('width', (me.getViewport().width < LIFERAY_PHONE_MEDIA_BREAK ? (me.getViewport().width - 40) : 500));
+                modal.get('boundingBox').one('.select-calendar').setAttribute("disabled", "disabled");
                 modal.show();
             });
 
@@ -387,8 +388,6 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 var description = modal.get('boundingBox').one('.add-description').get('value');
                 var date = modal.get('boundingBox').one('.lfr-input-date input').get('value');
                 var calendarId = me.getCalendarId(modal);
-                
-                console.log("calendar id ", calendarId);
                 
                 e.preventDefault();
                 e.stopPropagation();
@@ -429,9 +428,9 @@ AUI.add('todo-portlet', function (Y, NAME) {
             modal.get('boundingBox').one('.chk-calendar').on('change', function (e) {
             	var select = modal.get('boundingBox').one('.select-calendar');
             	if (select.attr("disabled")) {
-            		select.attr("disabled", false)
+            		select.removeAttribute("disabled");
             	} else {
-            		select.attr("disabled", "disabled");
+            		select.setAttribute("disabled", "disabled");
             	}
             });
         },

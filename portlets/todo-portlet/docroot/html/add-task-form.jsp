@@ -61,7 +61,7 @@ List<com.liferay.calendar.model.Calendar> manageableCalendars = CalendarServiceU
 	<div class="control-group">
 		<label class="add-to-calendar"><input type="checkbox" class="chk-calendar" /> <liferay-ui:message key="edit-task-add-to-calendar" /></label>
         <div class="controls">            
-			<select class="select-calendar" disabled>
+			<select class="select-calendar">
 				<%
 				for (com.liferay.calendar.model.Calendar curCalendar : manageableCalendars) {
 				%>
