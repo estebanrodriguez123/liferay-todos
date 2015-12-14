@@ -74,9 +74,16 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     var count = "("+tasks.length+")";
                     box.one(containerClasses[i]+'-tasks-count').set('innerHTML',count);
                     for (var j = 0; j < tasks.length; j++) {
-                        tasks[j].dateFieldType = dateFieldType;
+                    	tasks[j].dateFieldType = dateFieldType;
                         tasks[j].done = (tasks[j].isCompleted) ? "done" : "";
+                        if (tasks[j])
+                        // checkbox
+                        tasks[j].checked = (tasks[j].calendarId !== 0)? "checked": "";
+                        // select
+                        tasks[j][tasks[j].calendarId] = "selected";
                         markup += Y.Lang.sub(box.one('#' + me.get('portletNamespace') + 'task-list-item-template').get('innerHTML'), tasks[j]);
+                        // removed text that was not substituted
+                        markup = markup.replace(/{\w+}/g, "");
                     }
                     box.one('.tasks' + containerClasses[i]).empty();
                     box.one('.tasks' + containerClasses[i]).append(markup);
@@ -149,9 +156,11 @@ AUI.add('todo-portlet', function (Y, NAME) {
             box.all(".tasks li").each(function(node) {
                 me._createCalendar('#' + node.one('.edit-time').get('id'));
                 
-                // TODO: load the state of the select according the calendarId of the task for now, the select
-                // is disabled by default
-                node.one(SELECT_CALENDAR).setAttribute("disabled", "disabled");
+                // only disable the select when the task was not added to the liferay calendar
+                if (!node.one(CHECKBOX_CALENDAR).attr("checked")) {
+                	node.one(SELECT_CALENDAR).setAttribute("disabled", "disabled");
+                }
+                
                 node.one(CHECKBOX_CALENDAR).on('change', function (event) { 
                 	me.checkHandler(event, node.one(SELECT_CALENDAR));
                 });
@@ -162,6 +171,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     var element = me.getMembers(this.get("parentNode"));
                     element.activity.addClass("hide");
                     element.edit.addClass("show");
+                    
                     //element.titleInput.set("value",element.title.get("text"));
                     //element.timeInput.set("value",element.time.get("text"));
                 });

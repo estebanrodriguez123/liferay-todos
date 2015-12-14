@@ -53,13 +53,13 @@
             </div>
 
 			<div class="control-group">
-				<label class="add-to-calendar"><input type="checkbox" class="chk-calendar" /> <liferay-ui:message key="edit-task-add-to-calendar" /></label>
+				<label class="add-to-calendar"><input {checked} type="checkbox" class="chk-calendar" /> <liferay-ui:message key="edit-task-add-to-calendar" /></label>
        			<div class="controls">            
 					<select class="select-calendar">
 						<%
 						for (com.liferay.calendar.model.Calendar curCalendar : manageableCalendars) {
 						%>
-						<option value="<%= curCalendar.getCalendarId() %>"><%= HtmlUtil.escape(curCalendar.getName(locale)) %></option>
+						<option {<%= curCalendar.getCalendarId() %>} value="<%= curCalendar.getCalendarId() %>"><%= HtmlUtil.escape(curCalendar.getName(locale)) %></option>
 						<%
 						}
 						%>
