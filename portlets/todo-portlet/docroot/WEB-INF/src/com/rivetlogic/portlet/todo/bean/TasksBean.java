@@ -149,6 +149,7 @@ public class TasksBean {
         document.put(JSON_TASK_DATA_DESCRIPTION, task.getDescription());
         document.put(JSON_TASK_DATA_IS_COMPLETED, task.getCompleted());
         document.put(JSON_TASK_DATA_DATE, TodoUtil.SDF.format(task.getDate()));
+        document.put(JSON_TASK_DATA_CALENDAR_ID, task.getCalendarId());
         return document;
     }
 }
