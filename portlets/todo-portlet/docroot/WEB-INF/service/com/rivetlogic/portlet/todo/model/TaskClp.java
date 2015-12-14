@@ -81,6 +81,7 @@ public class TaskClp extends BaseModelImpl<Task> implements Task {
 		attributes.put("description", getDescription());
 		attributes.put("date", getDate());
 		attributes.put("completed", getCompleted());
+		attributes.put("calendarId", getCalendarId());
 
 		return attributes;
 	}
@@ -121,6 +122,12 @@ public class TaskClp extends BaseModelImpl<Task> implements Task {
 
 		if (completed != null) {
 			setCompleted(completed);
+		}
+
+		Long calendarId = (Long)attributes.get("calendarId");
+
+		if (calendarId != null) {
+			setCalendarId(calendarId);
 		}
 	}
 
@@ -272,6 +279,29 @@ public class TaskClp extends BaseModelImpl<Task> implements Task {
 		}
 	}
 
+	@Override
+	public long getCalendarId() {
+		return _calendarId;
+	}
+
+	@Override
+	public void setCalendarId(long calendarId) {
+		_calendarId = calendarId;
+
+		if (_taskRemoteModel != null) {
+			try {
+				Class<?> clazz = _taskRemoteModel.getClass();
+
+				Method method = clazz.getMethod("setCalendarId", long.class);
+
+				method.invoke(_taskRemoteModel, calendarId);
+			}
+			catch (Exception e) {
+				throw new UnsupportedOperationException(e);
+			}
+		}
+	}
+
 	public BaseModel<?> getTaskRemoteModel() {
 		return _taskRemoteModel;
 	}
@@ -347,6 +377,7 @@ public class TaskClp extends BaseModelImpl<Task> implements Task {
 		clone.setDescription(getDescription());
 		clone.setDate(getDate());
 		clone.setCompleted(getCompleted());
+		clone.setCalendarId(getCalendarId());
 
 		return clone;
 	}
@@ -386,6 +417,10 @@ public class TaskClp extends BaseModelImpl<Task> implements Task {
 		}
 	}
 
+	public Class<?> getClpSerializerClass() {
+		return _clpSerializerClass;
+	}
+
 	@Override
 	public int hashCode() {
 		return (int)getPrimaryKey();
@@ -393,7 +428,7 @@ public class TaskClp extends BaseModelImpl<Task> implements Task {
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(13);
+		StringBundler sb = new StringBundler(15);
 
 		sb.append("{taskId=");
 		sb.append(getTaskId());
@@ -407,6 +442,8 @@ public class TaskClp extends BaseModelImpl<Task> implements Task {
 		sb.append(getDate());
 		sb.append(", completed=");
 		sb.append(getCompleted());
+		sb.append(", calendarId=");
+		sb.append(getCalendarId());
 		sb.append("}");
 
 		return sb.toString();
@@ -414,7 +451,7 @@ public class TaskClp extends BaseModelImpl<Task> implements Task {
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(22);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("<model><model-name>");
 		sb.append("com.rivetlogic.portlet.todo.model.Task");
@@ -444,6 +481,10 @@ public class TaskClp extends BaseModelImpl<Task> implements Task {
 			"<column><column-name>completed</column-name><column-value><![CDATA[");
 		sb.append(getCompleted());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>calendarId</column-name><column-value><![CDATA[");
+		sb.append(getCalendarId());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -457,5 +498,7 @@ public class TaskClp extends BaseModelImpl<Task> implements Task {
 	private String _description;
 	private Date _date;
 	private Boolean _completed;
+	private long _calendarId;
 	private BaseModel<?> _taskRemoteModel;
+	private Class<?> _clpSerializerClass = com.rivetlogic.portlet.todo.service.ClpSerializer.class;
 }

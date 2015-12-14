@@ -260,11 +260,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
         },
         
         getCalendarId: function(select) {
-        	if (select.attr("disabled")) {
-        		return undefined;
-        	} else {
-        		return select.val();
-        	}
+        	return select.attr("disabled")? null : select.val();
         },
         
         /**

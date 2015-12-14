@@ -23,10 +23,13 @@ import com.liferay.calendar.model.CalendarResource;
 import com.liferay.calendar.service.CalendarBookingLocalServiceUtil;
 import com.liferay.calendar.service.CalendarLocalServiceUtil;
 import com.liferay.calendar.service.CalendarResourceLocalServiceUtil;
+import com.liferay.calendar.service.CalendarServiceUtil;
 import com.liferay.calendar.service.persistence.CalendarBookingFinderUtil;
 import com.liferay.calendar.service.persistence.CalendarBookingUtil;
+import com.liferay.calendar.util.comparator.CalendarNameComparator;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -144,10 +147,12 @@ public class TodoPortlet extends MVCPortlet {
         Task task = createTaskFromRequest(request);
         if (TodoValidator.validateNewTask(task)) {
             try {
-            	task = TaskLocalServiceUtil.createTask(task);
-            	// TODO: update task model to include calendar id and a flag to optionally add it to liferay calendar
-            	//addToCalendar(request, task);
+            	// add task to liferay calendar only if calendarId is valid
+            	if (task.getCalendarId() != 0) {
+            		addCalendarBooking(request, task);
+            	}
             	
+            	task = TaskLocalServiceUtil.createTask(task);
                 jsonObject.put(COMMAND_SUCCESS, true);
                 jsonObject.put(TasksBean.JSON_TASK_DATA_ID, task.getTaskId());
             } catch (Exception e) {
@@ -198,6 +203,7 @@ public class TodoPortlet extends MVCPortlet {
         task.setDate(calendar.getTime());
         task.setDescription(ParamUtil.getString(request, TasksBean.JSON_TASK_DATA_DESCRIPTION, StringPool.BLANK));
         task.setName(ParamUtil.getString(request, TasksBean.JSON_TASK_DATA_NAME, StringPool.BLANK));
+        task.setCalendarId(ParamUtil.getLong(request, TasksBean.JSON_TASK_DATA_CALENDAR_ID));
     }
     
     private Task createTaskFromRequest(HttpServletRequest request) {
@@ -217,8 +223,8 @@ public class TodoPortlet extends MVCPortlet {
         calendar.set(year, month, day);
         return calendar;
     }
-    
-    private void addToCalendar(HttpServletRequest request, Task task) throws PortalException, SystemException {
+        
+    private void addCalendarBooking(HttpServletRequest request, Task task) throws PortalException, SystemException {
 
         Map<Locale, String> titleMap = new HashMap<Locale, String>();
 		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();

@@ -55,6 +55,7 @@ public class TaskWrapper implements Task, ModelWrapper<Task> {
 		attributes.put("description", getDescription());
 		attributes.put("date", getDate());
 		attributes.put("completed", getCompleted());
+		attributes.put("calendarId", getCalendarId());
 
 		return attributes;
 	}
@@ -95,6 +96,12 @@ public class TaskWrapper implements Task, ModelWrapper<Task> {
 
 		if (completed != null) {
 			setCompleted(completed);
+		}
+
+		Long calendarId = (Long)attributes.get("calendarId");
+
+		if (calendarId != null) {
+			setCalendarId(calendarId);
 		}
 	}
 
@@ -258,6 +265,26 @@ public class TaskWrapper implements Task, ModelWrapper<Task> {
 	@Override
 	public void setCompleted(java.lang.Boolean completed) {
 		_task.setCompleted(completed);
+	}
+
+	/**
+	* Returns the calendar ID of this task.
+	*
+	* @return the calendar ID of this task
+	*/
+	@Override
+	public long getCalendarId() {
+		return _task.getCalendarId();
+	}
+
+	/**
+	* Sets the calendar ID of this task.
+	*
+	* @param calendarId the calendar ID of this task
+	*/
+	@Override
+	public void setCalendarId(long calendarId) {
+		_task.setCalendarId(calendarId);
 	}
 
 	@Override

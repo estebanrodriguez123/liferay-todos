@@ -23,6 +23,7 @@
 <%@page import="java.util.List" %>
 <%@page import="com.liferay.portal.theme.ThemeDisplay" %>
 <%@page import="com.liferay.portal.kernel.util.HtmlUtil" %>
+<%@page import="com.rivetlogic.portlet.todo.bean.TasksBean" %>
 
 <%
 Calendar defaultValueDate = CalendarFactoryUtil.getCalendar();
@@ -32,7 +33,7 @@ List<com.liferay.calendar.model.Calendar> manageableCalendars = CalendarServiceU
 		themeDisplay.getCompanyId(), null, null, null, true,
 		QueryUtil.ALL_POS, QueryUtil.ALL_POS,
 		new CalendarNameComparator(true),
-		"MANAGE_BOOKINGS");
+		TasksBean.ACTION_KEY_MANAGE_BOOKINGS);
 %>
 
 <script id="<portlet:namespace/>add-task-template" type="text/x-html-template">

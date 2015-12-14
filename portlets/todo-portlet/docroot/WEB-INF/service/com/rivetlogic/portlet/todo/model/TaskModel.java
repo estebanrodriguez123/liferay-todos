@@ -161,6 +161,20 @@ public interface TaskModel extends BaseModel<Task> {
 	 */
 	public void setCompleted(Boolean completed);
 
+	/**
+	 * Returns the calendar ID of this task.
+	 *
+	 * @return the calendar ID of this task
+	 */
+	public long getCalendarId();
+
+	/**
+	 * Sets the calendar ID of this task.
+	 *
+	 * @param calendarId the calendar ID of this task
+	 */
+	public void setCalendarId(long calendarId);
+
 	@Override
 	public boolean isNew();
 
@@ -198,19 +212,19 @@ public interface TaskModel extends BaseModel<Task> {
 	public Object clone();
 
 	@Override
-	public int compareTo(Task task);
+	public int compareTo(com.rivetlogic.portlet.todo.model.Task task);
 
 	@Override
 	public int hashCode();
 
 	@Override
-	public CacheModel<Task> toCacheModel();
+	public CacheModel<com.rivetlogic.portlet.todo.model.Task> toCacheModel();
 
 	@Override
-	public Task toEscapedModel();
+	public com.rivetlogic.portlet.todo.model.Task toEscapedModel();
 
 	@Override
-	public Task toUnescapedModel();
+	public com.rivetlogic.portlet.todo.model.Task toUnescapedModel();
 
 	@Override
 	public String toString();

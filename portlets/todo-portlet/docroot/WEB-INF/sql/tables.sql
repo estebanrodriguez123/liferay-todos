@@ -4,5 +4,6 @@ create table todo_Task (
 	name VARCHAR(75) null,
 	description STRING null,
 	date_ DATE null,
-	completed BOOLEAN
+	completed BOOLEAN,
+	calendarId LONG
 );

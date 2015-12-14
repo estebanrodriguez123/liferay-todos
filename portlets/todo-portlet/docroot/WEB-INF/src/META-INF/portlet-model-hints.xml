@@ -10,5 +10,6 @@
 		</field>
 		<field name="date" type="Date" />
 		<field name="completed" type="Boolean" />
+		<field name="calendarId" type="long" />
 	</model>
 </model-hints>

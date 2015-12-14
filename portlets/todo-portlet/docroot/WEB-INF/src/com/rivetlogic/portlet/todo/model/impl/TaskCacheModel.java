@@ -37,7 +37,7 @@ import java.util.Date;
 public class TaskCacheModel implements CacheModel<Task>, Externalizable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(13);
+		StringBundler sb = new StringBundler(15);
 
 		sb.append("{taskId=");
 		sb.append(taskId);
@@ -51,6 +51,8 @@ public class TaskCacheModel implements CacheModel<Task>, Externalizable {
 		sb.append(date);
 		sb.append(", completed=");
 		sb.append(completed);
+		sb.append(", calendarId=");
+		sb.append(calendarId);
 		sb.append("}");
 
 		return sb.toString();
@@ -85,6 +87,7 @@ public class TaskCacheModel implements CacheModel<Task>, Externalizable {
 		}
 
 		taskImpl.setCompleted(completed);
+		taskImpl.setCalendarId(calendarId);
 
 		taskImpl.resetOriginalValues();
 
@@ -99,6 +102,7 @@ public class TaskCacheModel implements CacheModel<Task>, Externalizable {
 		description = objectInput.readUTF();
 		date = objectInput.readLong();
 		completed = objectInput.readBoolean();
+		calendarId = objectInput.readLong();
 	}
 
 	@Override
@@ -123,6 +127,7 @@ public class TaskCacheModel implements CacheModel<Task>, Externalizable {
 
 		objectOutput.writeLong(date);
 		objectOutput.writeBoolean(completed);
+		objectOutput.writeLong(calendarId);
 	}
 
 	public long taskId;
@@ -131,4 +136,5 @@ public class TaskCacheModel implements CacheModel<Task>, Externalizable {
 	public String description;
 	public long date;
 	public Boolean completed;
+	public long calendarId;
 }

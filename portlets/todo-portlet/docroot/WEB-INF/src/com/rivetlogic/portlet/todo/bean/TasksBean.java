@@ -52,6 +52,9 @@ public class TasksBean {
     public static final String JSON_TASK_DATA_DESCRIPTION = "description";
     public static final String JSON_TASK_DATA_IS_COMPLETED = "isCompleted";
     public static final String JSON_TASK_DATA_DATE = "date";
+    public static final String JSON_TASK_DATA_CALENDAR_ID = "calendarId";
+    
+    public static final String ACTION_KEY_MANAGE_BOOKINGS = "MANAGE_BOOKINGS";
     
     
     public TasksBean(Long userId, Date now) {

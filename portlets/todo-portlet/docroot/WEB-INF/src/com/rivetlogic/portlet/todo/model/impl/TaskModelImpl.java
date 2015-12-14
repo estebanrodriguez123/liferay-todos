@@ -66,9 +66,10 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 			{ "name", Types.VARCHAR },
 			{ "description", Types.VARCHAR },
 			{ "date_", Types.TIMESTAMP },
-			{ "completed", Types.BOOLEAN }
+			{ "completed", Types.BOOLEAN },
+			{ "calendarId", Types.BIGINT }
 		};
-	public static final String TABLE_SQL_CREATE = "create table todo_Task (taskId LONG not null primary key,userId LONG,name VARCHAR(75) null,description STRING null,date_ DATE null,completed BOOLEAN)";
+	public static final String TABLE_SQL_CREATE = "create table todo_Task (taskId LONG not null primary key,userId LONG,name VARCHAR(75) null,description STRING null,date_ DATE null,completed BOOLEAN,calendarId LONG)";
 	public static final String TABLE_SQL_DROP = "drop table todo_Task";
 	public static final String ORDER_BY_JPQL = " ORDER BY task.date ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY todo_Task.date_ ASC";
@@ -132,6 +133,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		attributes.put("description", getDescription());
 		attributes.put("date", getDate());
 		attributes.put("completed", getCompleted());
+		attributes.put("calendarId", getCalendarId());
 
 		return attributes;
 	}
@@ -172,6 +174,12 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 
 		if (completed != null) {
 			setCompleted(completed);
+		}
+
+		Long calendarId = (Long)attributes.get("calendarId");
+
+		if (calendarId != null) {
+			setCalendarId(calendarId);
 		}
 	}
 
@@ -269,6 +277,16 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		_completed = completed;
 	}
 
+	@Override
+	public long getCalendarId() {
+		return _calendarId;
+	}
+
+	@Override
+	public void setCalendarId(long calendarId) {
+		_calendarId = calendarId;
+	}
+
 	public long getColumnBitmask() {
 		return _columnBitmask;
 	}
@@ -306,6 +324,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		taskImpl.setDescription(getDescription());
 		taskImpl.setDate(getDate());
 		taskImpl.setCompleted(getCompleted());
+		taskImpl.setCalendarId(getCalendarId());
 
 		taskImpl.resetOriginalValues();
 
@@ -398,12 +417,14 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 
 		taskCacheModel.completed = getCompleted();
 
+		taskCacheModel.calendarId = getCalendarId();
+
 		return taskCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(13);
+		StringBundler sb = new StringBundler(15);
 
 		sb.append("{taskId=");
 		sb.append(getTaskId());
@@ -417,6 +438,8 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		sb.append(getDate());
 		sb.append(", completed=");
 		sb.append(getCompleted());
+		sb.append(", calendarId=");
+		sb.append(getCalendarId());
 		sb.append("}");
 
 		return sb.toString();
@@ -424,7 +447,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(22);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("<model><model-name>");
 		sb.append("com.rivetlogic.portlet.todo.model.Task");
@@ -454,6 +477,10 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 			"<column><column-name>completed</column-name><column-value><![CDATA[");
 		sb.append(getCompleted());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>calendarId</column-name><column-value><![CDATA[");
+		sb.append(getCalendarId());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -471,6 +498,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 	private String _description;
 	private Date _date;
 	private Boolean _completed;
+	private long _calendarId;
 	private long _columnBitmask;
 	private Task _escapedModel;
 }

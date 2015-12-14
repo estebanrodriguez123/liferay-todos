@@ -16,6 +16,7 @@ package com.rivetlogic.portlet.todo.service;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -52,6 +53,7 @@ public interface TaskLocalService extends BaseLocalService, InvokableLocalServic
 	* @return the task that was added
 	* @throws SystemException if a system exception occurred
 	*/
+	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
 	public com.rivetlogic.portlet.todo.model.Task addTask(
 		com.rivetlogic.portlet.todo.model.Task task)
 		throws com.liferay.portal.kernel.exception.SystemException;
@@ -72,6 +74,7 @@ public interface TaskLocalService extends BaseLocalService, InvokableLocalServic
 	* @throws PortalException if a task with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
+	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
 	public com.rivetlogic.portlet.todo.model.Task deleteTask(long taskId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
@@ -83,6 +86,7 @@ public interface TaskLocalService extends BaseLocalService, InvokableLocalServic
 	* @return the task that was removed
 	* @throws SystemException if a system exception occurred
 	*/
+	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
 	public com.rivetlogic.portlet.todo.model.Task deleteTask(
 		com.rivetlogic.portlet.todo.model.Task task)
 		throws com.liferay.portal.kernel.exception.SystemException;
@@ -222,6 +226,7 @@ public interface TaskLocalService extends BaseLocalService, InvokableLocalServic
 	* @return the task that was updated
 	* @throws SystemException if a system exception occurred
 	*/
+	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
 	public com.rivetlogic.portlet.todo.model.Task updateTask(
 		com.rivetlogic.portlet.todo.model.Task task)
 		throws com.liferay.portal.kernel.exception.SystemException;

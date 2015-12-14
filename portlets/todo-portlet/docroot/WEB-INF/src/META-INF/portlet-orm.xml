@@ -18,6 +18,7 @@
 				<temporal>TIMESTAMP</temporal>
 			</basic>
 			<basic name="completed" />
+			<basic name="calendarId" />
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />
