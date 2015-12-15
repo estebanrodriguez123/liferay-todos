@@ -195,7 +195,14 @@ AUI.add('todo-portlet', function (Y, NAME) {
 	                    var oldCount = parseInt(oldCountStr);
 	                    var newCount = (oldCount != NaN? oldCount-1:0);
 	                    var newCountStr = "("+newCount+")";
-	                    me.deleteTaskCall({taskId: element.edit.one('input[type="hidden"]').get('value')}, function() {
+	                    var id = element.edit.one('.edit-task-id').get('value');
+	                    var calendarBookingId = element.edit.one('.edit-calendar-booking-id').get('value');
+	                    
+	                    me.deleteTaskCall(
+                    		{
+                    			taskId: id,
+                    			calendarBookingId: calendarBookingId
+                    		}, function() {
 	                        element.li.remove(true);
 	                        listHeader.one('.taskscount').set('innerHTML', newCountStr);
 	                    });

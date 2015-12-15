@@ -171,8 +171,14 @@ public class TodoPortlet extends MVCPortlet {
     
     private void deleteTask(HttpServletRequest request, JSONObject jsonObject) {
         Long taskId = ParamUtil.getLong(request, TasksBean.JSON_TASK_DATA_ID, TasksBean.UNDEFINED_ID);
+        Long calendarBookingId = ParamUtil.getLong(request, TasksBean.JSON_TASK_DATA_CALENDAR_BOOKING_ID, TasksBean.UNDEFINED_ID);
         if (taskId != TasksBean.UNDEFINED_ID) {
             try {
+            	// if the task was added to a liferay calendar
+            	if (calendarBookingId != TasksBean.UNDEFINED_ID) {
+            		// delete the task from the liferay calendar
+            		deleteCalendarBooking(calendarBookingId);
+            	}
                 TaskLocalServiceUtil.deleteTask(taskId);
                 jsonObject.put(COMMAND_SUCCESS, true);
             } catch (Exception e) {
@@ -192,7 +198,9 @@ public class TodoPortlet extends MVCPortlet {
             Task task = TaskLocalServiceUtil.getTask(taskId);
             setCommonTaskFields(request, task);
             if (TodoValidator.validateNewTask(task)) {
+            	// if the task was added to a liferay calendar
             	if (calendarId != TasksBean.UNDEFINED_ID) {
+            		// update the task info in the liferay calendar
             		CalendarBooking cb = updateCalendarBooking(request, task, calendarBookingId, calendarId);
             		task.setCalendarBookingId( cb == null? TasksBean.UNDEFINED_ID : cb.getCalendarBookingId() );
             	}
@@ -263,5 +271,13 @@ public class TodoPortlet extends MVCPortlet {
     	}
     	
     	return cb;
+    }
+    
+    private void deleteCalendarBooking(long calendarBookingId) {
+    	try {
+			CalendarBookingLocalServiceUtil.deleteCalendarBooking(calendarBookingId);
+		} catch (PortalException | SystemException e) {
+			LOG.error(e);
+		}
     }
 }
