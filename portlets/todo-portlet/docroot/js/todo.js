@@ -31,6 +31,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
     
     var SELECT_CALENDAR = '.select-calendar';
     var CHECKBOX_CALENDAR = '.chk-calendar';
+    var UNDEFINED_CALENDAR_ID = -1; // matches the value of TasksBean.java
     
     Y.Todo = Y.Base.create('todo-portlet', Y.Base, [], {
 
@@ -78,7 +79,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
                         tasks[j].done = (tasks[j].isCompleted) ? "done" : "";
                         if (tasks[j])
                         // checkbox
-                        tasks[j].checked = (tasks[j].calendarId !== 0)? "checked": "";
+                        tasks[j].checked = (tasks[j].calendarId !== UNDEFINED_CALENDAR_ID)? "checked": "";
                         // select
                         tasks[j][tasks[j].calendarId] = "selected";
                         markup += Y.Lang.sub(box.one('#' + me.get('portletNamespace') + 'task-list-item-template').get('innerHTML'), tasks[j]);
@@ -214,15 +215,27 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     e.stopPropagation();
                     if (cont.all('.error').size() == 0) {
                         var element = me.getMembers(this.get("parentNode").get("parentNode").get("parentNode"));
-                        var id = element.edit.one('input[type="hidden"]').get('value');
+                        var id = element.edit.one('.edit-task-id').get('value');
+                        var calendarId = me.getCalendarId(element.selectCalendar);
+                        var calendarBookingId = element.edit.one('.edit-calendar-booking-id').get('value');
                         var title = element.edit.one('.edit-title').get('value');
                         var description = element.edit.one('.edit-description').get('value');
                         var date = element.edit.one('.lfr-input-date input').get('value');
                         
                         date = new Date(date);
                         
-                        me.updateTaskCall({taskId: id, name: title, description: description, day: (date.getDate() + 1), month: date.getMonth(), year: date.getFullYear()}, function() {
-                            me.updateTaskListUI(function() {
+                        me.updateTaskCall(
+                    		{
+                        		taskId: id, 
+                        		name: title, 
+                        		description: description, 
+                        		day: (date.getDate() + 1), 
+                        		month: date.getMonth(), 
+                        		year: date.getFullYear(),
+                        		calendarId: calendarId, 
+                        		calendarBookingId: calendarBookingId
+                    		}, function() {
+                    			me.updateTaskListUI(function() {
                                 me.openTaskGroup(id);
                             });
                         });
@@ -270,7 +283,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
         },
         
         getCalendarId: function(select) {
-        	return select.attr("disabled")? null : select.val();
+        	return select.attr("disabled")? UNDEFINED_CALENDAR_ID : select.val();
         },
         
         /**
@@ -488,12 +501,14 @@ AUI.add('todo-portlet', function (Y, NAME) {
         /** Returns the different members of a single task
     @element Must be a li containing a task **/
         getMembers: function (element) {
-            var activity = element.one(".activity");
-            edit = element.one(".edit");
-            title = activity.one(".activity-title");
-            time = activity.one(".activity-time");
-            titleInput = edit.one(".edit-title");
-            timeInput = edit.one(".edit-time");
+            var activity = element.one(".activity"),
+            edit = element.one(".edit"),
+            title = activity.one(".activity-title"),
+            time = activity.one(".activity-time"),
+            titleInput = edit.one(".edit-title"),
+            timeInput = edit.one(".edit-time"),
+            selectCalendar = edit.one(SELECT_CALENDAR);
+            
 
             return {
                 li: element,
@@ -502,7 +517,8 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 title: title,
                 time: time,
                 titleInput: titleInput,
-                timeInput: timeInput
+                timeInput: timeInput,
+                selectCalendar: selectCalendar
             };
         }
 

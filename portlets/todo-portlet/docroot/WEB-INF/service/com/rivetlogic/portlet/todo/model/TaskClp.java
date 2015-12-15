@@ -81,7 +81,7 @@ public class TaskClp extends BaseModelImpl<Task> implements Task {
 		attributes.put("description", getDescription());
 		attributes.put("date", getDate());
 		attributes.put("completed", getCompleted());
-		attributes.put("calendarId", getCalendarId());
+		attributes.put("calendarBookingId", getCalendarBookingId());
 
 		return attributes;
 	}
@@ -124,10 +124,10 @@ public class TaskClp extends BaseModelImpl<Task> implements Task {
 			setCompleted(completed);
 		}
 
-		Long calendarId = (Long)attributes.get("calendarId");
+		Long calendarBookingId = (Long)attributes.get("calendarBookingId");
 
-		if (calendarId != null) {
-			setCalendarId(calendarId);
+		if (calendarBookingId != null) {
+			setCalendarBookingId(calendarBookingId);
 		}
 	}
 
@@ -280,21 +280,22 @@ public class TaskClp extends BaseModelImpl<Task> implements Task {
 	}
 
 	@Override
-	public long getCalendarId() {
-		return _calendarId;
+	public long getCalendarBookingId() {
+		return _calendarBookingId;
 	}
 
 	@Override
-	public void setCalendarId(long calendarId) {
-		_calendarId = calendarId;
+	public void setCalendarBookingId(long calendarBookingId) {
+		_calendarBookingId = calendarBookingId;
 
 		if (_taskRemoteModel != null) {
 			try {
 				Class<?> clazz = _taskRemoteModel.getClass();
 
-				Method method = clazz.getMethod("setCalendarId", long.class);
+				Method method = clazz.getMethod("setCalendarBookingId",
+						long.class);
 
-				method.invoke(_taskRemoteModel, calendarId);
+				method.invoke(_taskRemoteModel, calendarBookingId);
 			}
 			catch (Exception e) {
 				throw new UnsupportedOperationException(e);
@@ -377,7 +378,7 @@ public class TaskClp extends BaseModelImpl<Task> implements Task {
 		clone.setDescription(getDescription());
 		clone.setDate(getDate());
 		clone.setCompleted(getCompleted());
-		clone.setCalendarId(getCalendarId());
+		clone.setCalendarBookingId(getCalendarBookingId());
 
 		return clone;
 	}
@@ -442,8 +443,8 @@ public class TaskClp extends BaseModelImpl<Task> implements Task {
 		sb.append(getDate());
 		sb.append(", completed=");
 		sb.append(getCompleted());
-		sb.append(", calendarId=");
-		sb.append(getCalendarId());
+		sb.append(", calendarBookingId=");
+		sb.append(getCalendarBookingId());
 		sb.append("}");
 
 		return sb.toString();
@@ -482,8 +483,8 @@ public class TaskClp extends BaseModelImpl<Task> implements Task {
 		sb.append(getCompleted());
 		sb.append("]]></column-value></column>");
 		sb.append(
-			"<column><column-name>calendarId</column-name><column-value><![CDATA[");
-		sb.append(getCalendarId());
+			"<column><column-name>calendarBookingId</column-name><column-value><![CDATA[");
+		sb.append(getCalendarBookingId());
 		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
@@ -498,7 +499,7 @@ public class TaskClp extends BaseModelImpl<Task> implements Task {
 	private String _description;
 	private Date _date;
 	private Boolean _completed;
-	private long _calendarId;
+	private long _calendarBookingId;
 	private BaseModel<?> _taskRemoteModel;
 	private Class<?> _clpSerializerClass = com.rivetlogic.portlet.todo.service.ClpSerializer.class;
 }

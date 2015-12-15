@@ -67,9 +67,9 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 			{ "description", Types.VARCHAR },
 			{ "date_", Types.TIMESTAMP },
 			{ "completed", Types.BOOLEAN },
-			{ "calendarId", Types.BIGINT }
+			{ "calendarBookingId", Types.BIGINT }
 		};
-	public static final String TABLE_SQL_CREATE = "create table todo_Task (taskId LONG not null primary key,userId LONG,name VARCHAR(75) null,description STRING null,date_ DATE null,completed BOOLEAN,calendarId LONG)";
+	public static final String TABLE_SQL_CREATE = "create table todo_Task (taskId LONG not null primary key,userId LONG,name VARCHAR(75) null,description STRING null,date_ DATE null,completed BOOLEAN,calendarBookingId LONG)";
 	public static final String TABLE_SQL_DROP = "drop table todo_Task";
 	public static final String ORDER_BY_JPQL = " ORDER BY task.date ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY todo_Task.date_ ASC";
@@ -133,7 +133,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		attributes.put("description", getDescription());
 		attributes.put("date", getDate());
 		attributes.put("completed", getCompleted());
-		attributes.put("calendarId", getCalendarId());
+		attributes.put("calendarBookingId", getCalendarBookingId());
 
 		return attributes;
 	}
@@ -176,10 +176,10 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 			setCompleted(completed);
 		}
 
-		Long calendarId = (Long)attributes.get("calendarId");
+		Long calendarBookingId = (Long)attributes.get("calendarBookingId");
 
-		if (calendarId != null) {
-			setCalendarId(calendarId);
+		if (calendarBookingId != null) {
+			setCalendarBookingId(calendarBookingId);
 		}
 	}
 
@@ -278,13 +278,13 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 	}
 
 	@Override
-	public long getCalendarId() {
-		return _calendarId;
+	public long getCalendarBookingId() {
+		return _calendarBookingId;
 	}
 
 	@Override
-	public void setCalendarId(long calendarId) {
-		_calendarId = calendarId;
+	public void setCalendarBookingId(long calendarBookingId) {
+		_calendarBookingId = calendarBookingId;
 	}
 
 	public long getColumnBitmask() {
@@ -324,7 +324,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		taskImpl.setDescription(getDescription());
 		taskImpl.setDate(getDate());
 		taskImpl.setCompleted(getCompleted());
-		taskImpl.setCalendarId(getCalendarId());
+		taskImpl.setCalendarBookingId(getCalendarBookingId());
 
 		taskImpl.resetOriginalValues();
 
@@ -417,7 +417,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 
 		taskCacheModel.completed = getCompleted();
 
-		taskCacheModel.calendarId = getCalendarId();
+		taskCacheModel.calendarBookingId = getCalendarBookingId();
 
 		return taskCacheModel;
 	}
@@ -438,8 +438,8 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		sb.append(getDate());
 		sb.append(", completed=");
 		sb.append(getCompleted());
-		sb.append(", calendarId=");
-		sb.append(getCalendarId());
+		sb.append(", calendarBookingId=");
+		sb.append(getCalendarBookingId());
 		sb.append("}");
 
 		return sb.toString();
@@ -478,8 +478,8 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		sb.append(getCompleted());
 		sb.append("]]></column-value></column>");
 		sb.append(
-			"<column><column-name>calendarId</column-name><column-value><![CDATA[");
-		sb.append(getCalendarId());
+			"<column><column-name>calendarBookingId</column-name><column-value><![CDATA[");
+		sb.append(getCalendarBookingId());
 		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
@@ -498,7 +498,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 	private String _description;
 	private Date _date;
 	private Boolean _completed;
-	private long _calendarId;
+	private long _calendarBookingId;
 	private long _columnBitmask;
 	private Task _escapedModel;
 }

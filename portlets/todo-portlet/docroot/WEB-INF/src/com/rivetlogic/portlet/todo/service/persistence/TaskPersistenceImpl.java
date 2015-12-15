@@ -828,7 +828,7 @@ public class TaskPersistenceImpl extends BasePersistenceImpl<Task>
 		taskImpl.setDescription(task.getDescription());
 		taskImpl.setDate(task.getDate());
 		taskImpl.setCompleted(task.getCompleted());
-		taskImpl.setCalendarId(task.getCalendarId());
+		taskImpl.setCalendarBookingId(task.getCalendarBookingId());
 
 		return taskImpl;
 	}

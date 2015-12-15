@@ -13,6 +13,6 @@
 		<property name="description" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="date" type="org.hibernate.type.TimestampType" column="date_" />
 		<property name="completed" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
-		<property name="calendarId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="calendarBookingId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 	</class>
 </hibernate-mapping>

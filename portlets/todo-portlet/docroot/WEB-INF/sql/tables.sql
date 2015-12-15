@@ -5,5 +5,5 @@ create table todo_Task (
 	description STRING null,
 	date_ DATE null,
 	completed BOOLEAN,
-	calendarId LONG
+	calendarBookingId LONG
 );

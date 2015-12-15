@@ -162,18 +162,18 @@ public interface TaskModel extends BaseModel<Task> {
 	public void setCompleted(Boolean completed);
 
 	/**
-	 * Returns the calendar ID of this task.
+	 * Returns the calendar booking ID of this task.
 	 *
-	 * @return the calendar ID of this task
+	 * @return the calendar booking ID of this task
 	 */
-	public long getCalendarId();
+	public long getCalendarBookingId();
 
 	/**
-	 * Sets the calendar ID of this task.
+	 * Sets the calendar booking ID of this task.
 	 *
-	 * @param calendarId the calendar ID of this task
+	 * @param calendarBookingId the calendar booking ID of this task
 	 */
-	public void setCalendarId(long calendarId);
+	public void setCalendarBookingId(long calendarBookingId);
 
 	@Override
 	public boolean isNew();

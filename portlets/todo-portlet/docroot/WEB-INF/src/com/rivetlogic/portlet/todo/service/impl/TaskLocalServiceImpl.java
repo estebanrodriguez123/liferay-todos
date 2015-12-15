@@ -62,7 +62,7 @@ public class TaskLocalServiceImpl extends TaskLocalServiceBaseImpl {
         newTask.setDescription(task.getDescription());
         newTask.setName(task.getName());
         newTask.setUserId(task.getUserId());
-        newTask.setCalendarId(task.getCalendarId());
+        newTask.setCalendarBookingId(task.getCalendarBookingId());
         taskPersistence.update(newTask);
         return newTask;
     }

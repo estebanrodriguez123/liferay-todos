@@ -85,7 +85,6 @@ public class TodoPortlet extends MVCPortlet {
     private static final String DATE_MONTH = "month";
     private static final String DATE_YEAR = "year";
     
-    private static final int UNDEFINED_ID = -1;
     private static final int DEFAULT_INT_VALUE = 0;
     
     @Override
@@ -122,8 +121,8 @@ public class TodoPortlet extends MVCPortlet {
     }
     
     private void toggleTask(HttpServletRequest request, JSONObject jsonObject) {
-        Long taskId = ParamUtil.getLong(request, TasksBean.JSON_TASK_DATA_ID, UNDEFINED_ID);
-        if (taskId != UNDEFINED_ID) {
+        Long taskId = ParamUtil.getLong(request, TasksBean.JSON_TASK_DATA_ID, TasksBean.UNDEFINED_ID);
+        if (taskId != TasksBean.UNDEFINED_ID) {
             try {
                 Task task = TaskLocalServiceUtil.getTask(taskId);
                 task.setCompleted(!task.getCompleted());
@@ -145,11 +144,16 @@ public class TodoPortlet extends MVCPortlet {
     
     private void addTask(HttpServletRequest request, JSONObject jsonObject) {
         Task task = createTaskFromRequest(request);
+        long calendarId = ParamUtil.getLong(request, TasksBean.JSON_TASK_DATA_CALENDAR_ID, TasksBean.UNDEFINED_ID);
         if (TodoValidator.validateNewTask(task)) {
             try {
             	// add task to liferay calendar only if calendarId is valid
-            	if (task.getCalendarId() != 0) {
-            		addCalendarBooking(request, task);
+            	if (calendarId != TasksBean.UNDEFINED_ID) {
+            		CalendarBooking cb = addCalendarBooking(request, task, calendarId);
+            		task.setCalendarBookingId( cb == null? TasksBean.UNDEFINED_ID : cb.getCalendarBookingId() );
+            	} else {
+            		// if no calendar was selected, assing a default value to the field
+            		task.setCalendarBookingId(TasksBean.UNDEFINED_ID);
             	}
             	
             	task = TaskLocalServiceUtil.createTask(task);
@@ -166,8 +170,8 @@ public class TodoPortlet extends MVCPortlet {
     }
     
     private void deleteTask(HttpServletRequest request, JSONObject jsonObject) {
-        Long taskId = ParamUtil.getLong(request, TasksBean.JSON_TASK_DATA_ID, UNDEFINED_ID);
-        if (taskId != UNDEFINED_ID) {
+        Long taskId = ParamUtil.getLong(request, TasksBean.JSON_TASK_DATA_ID, TasksBean.UNDEFINED_ID);
+        if (taskId != TasksBean.UNDEFINED_ID) {
             try {
                 TaskLocalServiceUtil.deleteTask(taskId);
                 jsonObject.put(COMMAND_SUCCESS, true);
@@ -181,11 +185,18 @@ public class TodoPortlet extends MVCPortlet {
     }
     
     private void updateTask(HttpServletRequest request, JSONObject jsonObject) {
-        Long taskId = ParamUtil.getLong(request, TasksBean.JSON_TASK_DATA_ID, UNDEFINED_ID);
+        Long taskId = ParamUtil.getLong(request, TasksBean.JSON_TASK_DATA_ID, TasksBean.UNDEFINED_ID);
+        Long calendarBookingId = ParamUtil.getLong(request, TasksBean.JSON_TASK_DATA_CALENDAR_BOOKING_ID, TasksBean.UNDEFINED_ID);
+        Long calendarId = ParamUtil.getLong(request, TasksBean.JSON_TASK_DATA_CALENDAR_ID, TasksBean.UNDEFINED_ID);
         try {
             Task task = TaskLocalServiceUtil.getTask(taskId);
             setCommonTaskFields(request, task);
             if (TodoValidator.validateNewTask(task)) {
+            	if (calendarId != TasksBean.UNDEFINED_ID) {
+            		CalendarBooking cb = updateCalendarBooking(request, task, calendarBookingId, calendarId);
+            		task.setCalendarBookingId( cb == null? TasksBean.UNDEFINED_ID : cb.getCalendarBookingId() );
+            	}
+            	
                 task = TaskLocalServiceUtil.updateTask(task);
                 jsonObject.put(COMMAND_SUCCESS, true);
                 jsonObject.put(TasksBean.JSON_TASK_DATA_ID, task.getTaskId());
@@ -203,7 +214,6 @@ public class TodoPortlet extends MVCPortlet {
         task.setDate(calendar.getTime());
         task.setDescription(ParamUtil.getString(request, TasksBean.JSON_TASK_DATA_DESCRIPTION, StringPool.BLANK));
         task.setName(ParamUtil.getString(request, TasksBean.JSON_TASK_DATA_NAME, StringPool.BLANK));
-        task.setCalendarId(ParamUtil.getLong(request, TasksBean.JSON_TASK_DATA_CALENDAR_ID));
     }
     
     private Task createTaskFromRequest(HttpServletRequest request) {
@@ -224,7 +234,7 @@ public class TodoPortlet extends MVCPortlet {
         return calendar;
     }
         
-    private void addCalendarBooking(HttpServletRequest request, Task task) throws PortalException, SystemException {
+    private CalendarBooking addCalendarBooking(HttpServletRequest request, Task task, long calendarId) throws PortalException, SystemException {
 
         Map<Locale, String> titleMap = new HashMap<Locale, String>();
 		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
@@ -232,10 +242,26 @@ public class TodoPortlet extends MVCPortlet {
 		titleMap.put(ServiceContextFactory.getInstance(request).getLocale(), task.getName());
 		descriptionMap.put(ServiceContextFactory.getInstance(request).getLocale(), task.getDescription());
 		
-        CalendarBookingLocalServiceUtil.addCalendarBooking(PortalUtil.getUserId(request),
-        	11116, new long[]{}, 0l, titleMap, descriptionMap,
+        return CalendarBookingLocalServiceUtil.addCalendarBooking(PortalUtil.getUserId(request),
+        	calendarId, new long[]{}, 0l, titleMap, descriptionMap,
 			StringPool.BLANK, task.getDate().getTime(),
 			task.getDate().getTime(), true, "", 0l, "", 0l, "",
 			ServiceContextFactory.getInstance(request));
+    }
+    
+    private CalendarBooking updateCalendarBooking(HttpServletRequest request, Task task, long calendarBookingId, long calendarId) throws PortalException, SystemException {
+    	CalendarBooking cb = (calendarBookingId == TasksBean.UNDEFINED_ID)? null : CalendarBookingLocalServiceUtil.getCalendarBooking(calendarBookingId);
+    	if (cb != null) {
+    		cb.setStartTime(task.getDate().getTime());
+    		cb.setEndTime(task.getDate().getTime());
+    		cb.setTitle(task.getName());
+    		cb.setDescription(task.getDescription());
+    		cb.setCalendarId(calendarId);
+    		CalendarBookingLocalServiceUtil.updateCalendarBooking(cb);
+    	} else {
+    		cb = addCalendarBooking(request, task, calendarId);
+    	}
+    	
+    	return cb;
     }
 }

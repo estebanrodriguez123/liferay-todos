@@ -30,7 +30,8 @@
     </div>
     <div class="edit">
         <form>
-            <input type="hidden" value="{taskId}" />
+            <input class="edit-task-id" type="hidden" value="{taskId}" />
+			<input class="edit-calendar-booking-id" type="hidden" value="{calendarBookingId}" />
             <div class="control-group">
                 <label class="control-label" for="title"><liferay-ui:message key="edit-task-title" /></label>
                 <div class="controls">

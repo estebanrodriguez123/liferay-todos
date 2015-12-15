@@ -55,7 +55,7 @@ public class TaskWrapper implements Task, ModelWrapper<Task> {
 		attributes.put("description", getDescription());
 		attributes.put("date", getDate());
 		attributes.put("completed", getCompleted());
-		attributes.put("calendarId", getCalendarId());
+		attributes.put("calendarBookingId", getCalendarBookingId());
 
 		return attributes;
 	}
@@ -98,10 +98,10 @@ public class TaskWrapper implements Task, ModelWrapper<Task> {
 			setCompleted(completed);
 		}
 
-		Long calendarId = (Long)attributes.get("calendarId");
+		Long calendarBookingId = (Long)attributes.get("calendarBookingId");
 
-		if (calendarId != null) {
-			setCalendarId(calendarId);
+		if (calendarBookingId != null) {
+			setCalendarBookingId(calendarBookingId);
 		}
 	}
 
@@ -268,23 +268,23 @@ public class TaskWrapper implements Task, ModelWrapper<Task> {
 	}
 
 	/**
-	* Returns the calendar ID of this task.
+	* Returns the calendar booking ID of this task.
 	*
-	* @return the calendar ID of this task
+	* @return the calendar booking ID of this task
 	*/
 	@Override
-	public long getCalendarId() {
-		return _task.getCalendarId();
+	public long getCalendarBookingId() {
+		return _task.getCalendarBookingId();
 	}
 
 	/**
-	* Sets the calendar ID of this task.
+	* Sets the calendar booking ID of this task.
 	*
-	* @param calendarId the calendar ID of this task
+	* @param calendarBookingId the calendar booking ID of this task
 	*/
 	@Override
-	public void setCalendarId(long calendarId) {
-		_task.setCalendarId(calendarId);
+	public void setCalendarBookingId(long calendarBookingId) {
+		_task.setCalendarBookingId(calendarBookingId);
 	}
 
 	@Override
