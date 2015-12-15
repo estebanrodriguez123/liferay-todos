@@ -193,6 +193,15 @@
 .todo-portlet .buttons {
     padding-top: .5em
 }
+
+.add-to-calendar {
+	vertical-align: baseline;
+}
+
+.add-to-calendar input[type=checkbox] {
+	vertical-align: baseline;
+}
+
 /************************ Calendar **************************/
 .yui3-calendarnav-prevmonth:before {
     content: "\f053";

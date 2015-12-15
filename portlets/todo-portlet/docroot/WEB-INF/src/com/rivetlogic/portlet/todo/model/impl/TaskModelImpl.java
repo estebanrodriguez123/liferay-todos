@@ -66,9 +66,10 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 			{ "name", Types.VARCHAR },
 			{ "description", Types.VARCHAR },
 			{ "date_", Types.TIMESTAMP },
-			{ "completed", Types.BOOLEAN }
+			{ "completed", Types.BOOLEAN },
+			{ "calendarBookingId", Types.BIGINT }
 		};
-	public static final String TABLE_SQL_CREATE = "create table todo_Task (taskId LONG not null primary key,userId LONG,name VARCHAR(75) null,description STRING null,date_ DATE null,completed BOOLEAN)";
+	public static final String TABLE_SQL_CREATE = "create table todo_Task (taskId LONG not null primary key,userId LONG,name VARCHAR(75) null,description STRING null,date_ DATE null,completed BOOLEAN,calendarBookingId LONG)";
 	public static final String TABLE_SQL_DROP = "drop table todo_Task";
 	public static final String ORDER_BY_JPQL = " ORDER BY task.date ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY todo_Task.date_ ASC";
@@ -132,6 +133,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		attributes.put("description", getDescription());
 		attributes.put("date", getDate());
 		attributes.put("completed", getCompleted());
+		attributes.put("calendarBookingId", getCalendarBookingId());
 
 		return attributes;
 	}
@@ -172,6 +174,12 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 
 		if (completed != null) {
 			setCompleted(completed);
+		}
+
+		Long calendarBookingId = (Long)attributes.get("calendarBookingId");
+
+		if (calendarBookingId != null) {
+			setCalendarBookingId(calendarBookingId);
 		}
 	}
 
@@ -269,6 +277,16 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		_completed = completed;
 	}
 
+	@Override
+	public long getCalendarBookingId() {
+		return _calendarBookingId;
+	}
+
+	@Override
+	public void setCalendarBookingId(long calendarBookingId) {
+		_calendarBookingId = calendarBookingId;
+	}
+
 	public long getColumnBitmask() {
 		return _columnBitmask;
 	}
@@ -306,6 +324,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		taskImpl.setDescription(getDescription());
 		taskImpl.setDate(getDate());
 		taskImpl.setCompleted(getCompleted());
+		taskImpl.setCalendarBookingId(getCalendarBookingId());
 
 		taskImpl.resetOriginalValues();
 
@@ -398,12 +417,14 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 
 		taskCacheModel.completed = getCompleted();
 
+		taskCacheModel.calendarBookingId = getCalendarBookingId();
+
 		return taskCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(13);
+		StringBundler sb = new StringBundler(15);
 
 		sb.append("{taskId=");
 		sb.append(getTaskId());
@@ -417,6 +438,8 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		sb.append(getDate());
 		sb.append(", completed=");
 		sb.append(getCompleted());
+		sb.append(", calendarBookingId=");
+		sb.append(getCalendarBookingId());
 		sb.append("}");
 
 		return sb.toString();
@@ -424,7 +447,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(22);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("<model><model-name>");
 		sb.append("com.rivetlogic.portlet.todo.model.Task");
@@ -454,6 +477,10 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 			"<column><column-name>completed</column-name><column-value><![CDATA[");
 		sb.append(getCompleted());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>calendarBookingId</column-name><column-value><![CDATA[");
+		sb.append(getCalendarBookingId());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -471,6 +498,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 	private String _description;
 	private Date _date;
 	private Boolean _completed;
+	private long _calendarBookingId;
 	private long _columnBitmask;
 	private Task _escapedModel;
 }

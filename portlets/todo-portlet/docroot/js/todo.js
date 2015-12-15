@@ -28,6 +28,11 @@ AUI.add('todo-portlet', function (Y, NAME) {
             required: true
           }
     };
+    
+    var SELECT_CALENDAR = '.select-calendar';
+    var CHECKBOX_CALENDAR = '.chk-calendar';
+    var UNDEFINED_CALENDAR_ID = -1; // matches the value of TasksBean.java
+    
     Y.Todo = Y.Base.create('todo-portlet', Y.Base, [], {
 
         lis: null,
@@ -70,9 +75,16 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     var count = "("+tasks.length+")";
                     box.one(containerClasses[i]+'-tasks-count').set('innerHTML',count);
                     for (var j = 0; j < tasks.length; j++) {
-                        tasks[j].dateFieldType = dateFieldType;
+                    	tasks[j].dateFieldType = dateFieldType;
                         tasks[j].done = (tasks[j].isCompleted) ? "done" : "";
+                        if (tasks[j])
+                        // checkbox
+                        tasks[j].checked = (tasks[j].calendarId !== UNDEFINED_CALENDAR_ID)? "checked": "";
+                        // select
+                        tasks[j][tasks[j].calendarId] = "selected";
                         markup += Y.Lang.sub(box.one('#' + me.get('portletNamespace') + 'task-list-item-template').get('innerHTML'), tasks[j]);
+                        // removed text that was not substituted
+                        markup = markup.replace(/{\w+}/g, "");
                     }
                     box.one('.tasks' + containerClasses[i]).empty();
                     box.one('.tasks' + containerClasses[i]).append(markup);
@@ -141,17 +153,26 @@ AUI.add('todo-portlet', function (Y, NAME) {
             this.undo = box.all(".activity-undo");
             this.inputs = box.all(".edit input, .edit button, .edit textarea");
             
-            /* initializes calendar */
+            /* initializes calendar and select */
             box.all(".tasks li").each(function(node) {
                 me._createCalendar('#' + node.one('.edit-time').get('id'));
+                
+                // only disable the select when the task was not added to the liferay calendar
+                if (!node.one(CHECKBOX_CALENDAR).attr("checked")) {
+                	node.one(SELECT_CALENDAR).setAttribute("disabled", "disabled");
+                }
+                
+                node.one(CHECKBOX_CALENDAR).on('change', function (event) { 
+                	me.checkHandler(event, node.one(SELECT_CALENDAR));
+                });
             });
             /** Shows edit mode when clicking on a task **/
             this.activities.each(function (activity) {
                 activity.on("click", function () {
                     var element = me.getMembers(this.get("parentNode"));
-
                     element.activity.addClass("hide");
                     element.edit.addClass("show");
+                    
                     //element.titleInput.set("value",element.title.get("text"));
                     //element.timeInput.set("value",element.time.get("text"));
                 });
@@ -174,7 +195,14 @@ AUI.add('todo-portlet', function (Y, NAME) {
 	                    var oldCount = parseInt(oldCountStr);
 	                    var newCount = (oldCount != NaN? oldCount-1:0);
 	                    var newCountStr = "("+newCount+")";
-	                    me.deleteTaskCall({taskId: element.edit.one('input[type="hidden"]').get('value')}, function() {
+	                    var id = element.edit.one('.edit-task-id').get('value');
+	                    var calendarBookingId = element.edit.one('.edit-calendar-booking-id').get('value');
+	                    
+	                    me.deleteTaskCall(
+                    		{
+                    			taskId: id,
+                    			calendarBookingId: calendarBookingId
+                    		}, function() {
 	                        element.li.remove(true);
 	                        listHeader.one('.taskscount').set('innerHTML', newCountStr);
 	                    });
@@ -194,15 +222,27 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     e.stopPropagation();
                     if (cont.all('.error').size() == 0) {
                         var element = me.getMembers(this.get("parentNode").get("parentNode").get("parentNode"));
-                        var id = element.edit.one('input[type="hidden"]').get('value');
+                        var id = element.edit.one('.edit-task-id').get('value');
+                        var calendarId = me.getCalendarId(element.selectCalendar);
+                        var calendarBookingId = element.edit.one('.edit-calendar-booking-id').get('value');
                         var title = element.edit.one('.edit-title').get('value');
                         var description = element.edit.one('.edit-description').get('value');
                         var date = element.edit.one('.lfr-input-date input').get('value');
                         
                         date = new Date(date);
                         
-                        me.updateTaskCall({taskId: id, name: title, description: description, day: (date.getDate() + 1), month: date.getMonth(), year: date.getFullYear()}, function() {
-                            me.updateTaskListUI(function() {
+                        me.updateTaskCall(
+                    		{
+                        		taskId: id, 
+                        		name: title, 
+                        		description: description, 
+                        		day: (date.getDate() + 1), 
+                        		month: date.getMonth(), 
+                        		year: date.getFullYear(),
+                        		calendarId: calendarId, 
+                        		calendarBookingId: calendarBookingId
+                    		}, function() {
+                    			me.updateTaskListUI(function() {
                                 me.openTaskGroup(id);
                             });
                         });
@@ -247,6 +287,10 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     e.stopPropagation();
                 });
             });
+        },
+        
+        getCalendarId: function(select) {
+        	return select.attr("disabled")? UNDEFINED_CALENDAR_ID : select.val();
         },
         
         /**
@@ -369,6 +413,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
             
             this.addButton.on('click', function (e) {
                 modal.set('width', (me.getViewport().width < LIFERAY_PHONE_MEDIA_BREAK ? (me.getViewport().width - 40) : 500));
+                modal.get('boundingBox').one(SELECT_CALENDAR).setAttribute("disabled", "disabled");
                 modal.show();
             });
 
@@ -377,6 +422,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 var title = modal.get('boundingBox').one('.add-title').get('value');
                 var description = modal.get('boundingBox').one('.add-description').get('value');
                 var date = modal.get('boundingBox').one('.lfr-input-date input').get('value');
+                var calendarId = me.getCalendarId(modal.get('boundingBox').one(SELECT_CALENDAR));
                 
                 e.preventDefault();
                 e.stopPropagation();
@@ -386,7 +432,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     date = new Date(date);
                     modal.get('boundingBox').one('.todo-portlet-loader').toggleClass('visible');
                     modal.get('boundingBox').one('.add-submit').setAttribute('disabled', 'true');
-                    me.addTaskCall({name: title, description: description, day: (date.getDate() + 1), month: date.getMonth(), year: date.getFullYear()}, function(data) {
+                    me.addTaskCall({name: title, description: description, day: (date.getDate() + 1), month: date.getMonth(), year: date.getFullYear(), calendarId: calendarId}, function(data) {
                         modal.get('boundingBox').one('.todo-portlet-loader').toggleClass('visible');
                         modal.get('boundingBox').one('.add-submit').removeAttribute('disabled');
                         me.updateTaskListUI(function() {
@@ -413,6 +459,21 @@ AUI.add('todo-portlet', function (Y, NAME) {
             		popover.hide();
             	}
             });
+            
+            modal.get('boundingBox').one(CHECKBOX_CALENDAR).on('change', function (event) {
+            	me.checkHandler(event, modal.get('boundingBox').one(SELECT_CALENDAR));
+            });
+        },
+        
+        /** Handler for the checkbox to enable or disabled the calendar select **/
+        checkHandler: function (event, selectCalendar) {
+        	if (selectCalendar) {
+        		if (selectCalendar.attr("disabled")) {
+	        		selectCalendar.removeAttribute("disabled");
+	        	} else {
+	        		selectCalendar.setAttribute("disabled", "disabled");
+	        	}
+        	}
         },
         
         openTaskGroup: function(taskId) {
@@ -439,18 +500,22 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     easing: 'cubic-bezier(0, 0.1, 0, 1)'
                 }
             });
+            
+            
         },
 
 
         /** Returns the different members of a single task
     @element Must be a li containing a task **/
         getMembers: function (element) {
-            var activity = element.one(".activity");
-            edit = element.one(".edit");
-            title = activity.one(".activity-title");
-            time = activity.one(".activity-time");
-            titleInput = edit.one(".edit-title");
-            timeInput = edit.one(".edit-time");
+            var activity = element.one(".activity"),
+            edit = element.one(".edit"),
+            title = activity.one(".activity-title"),
+            time = activity.one(".activity-time"),
+            titleInput = edit.one(".edit-title"),
+            timeInput = edit.one(".edit-time"),
+            selectCalendar = edit.one(SELECT_CALENDAR);
+            
 
             return {
                 li: element,
@@ -459,7 +524,8 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 title: title,
                 time: time,
                 titleInput: titleInput,
-                timeInput: timeInput
+                timeInput: timeInput,
+                selectCalendar: selectCalendar
             };
         }
 

@@ -17,6 +17,7 @@
  */
 --%>
 
+
 <script id="<portlet:namespace/>task-list-item-template" type="text/x-html-template">
 <li id="task-{taskId}" class="{done}">
     <div class="activity">
@@ -29,7 +30,8 @@
     </div>
     <div class="edit">
         <form>
-            <input type="hidden" value="{taskId}" />
+            <input class="edit-task-id" type="hidden" value="{taskId}" />
+			<input class="edit-calendar-booking-id" type="hidden" value="{calendarBookingId}" />
             <div class="control-group">
                 <label class="control-label" for="title"><liferay-ui:message key="edit-task-title" /></label>
                 <div class="controls">
@@ -50,6 +52,21 @@
                     <input id="taskCal{taskId}" name="time" type="{dateFieldType}" class="edit-time field-required" value="{date}"></input>
                 </div>
             </div>
+
+			<div class="control-group">
+				<label class="add-to-calendar"><input {checked} type="checkbox" class="chk-calendar" /> <liferay-ui:message key="edit-task-add-to-calendar" /></label>
+       			<div class="controls">            
+					<select class="select-calendar">
+						<%
+						for (com.liferay.calendar.model.Calendar curCalendar : manageableCalendars) {
+						%>
+						<option {<%= curCalendar.getCalendarId() %>} value="<%= curCalendar.getCalendarId() %>"><%= HtmlUtil.escape(curCalendar.getName(locale)) %></option>
+						<%
+						}
+						%>
+					</select>			
+        		</div>
+			</div>
 
        
             <button class="btn edit-submit"><liferay-ui:message key="edit-task-submit" /></button>
