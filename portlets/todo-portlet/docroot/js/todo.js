@@ -240,7 +240,13 @@ AUI.add('todo-portlet', function (Y, NAME) {
                         		month: date.getMonth(), 
                         		year: date.getFullYear(),
                         		calendarId: calendarId, 
-                        		calendarBookingId: calendarBookingId
+                        		calendarBookingId: calendarBookingId,
+                        		firstReminderType: undefined, //TODO use select element to get the reminders
+                    			firstReminderDuration: undefined,
+                    			firstReminderValue: undefined,
+                    			secondReminderType: undefined,
+                    			secondReminderDuration: undefined,
+                    			secondReminderValue: undefined,
                     		}, function() {
                     			me.updateTaskListUI(function() {
                                 me.openTaskGroup(id);
@@ -432,10 +438,24 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     date = new Date(date);
                     modal.get('boundingBox').one('.todo-portlet-loader').toggleClass('visible');
                     modal.get('boundingBox').one('.add-submit').setAttribute('disabled', 'true');
-                    me.addTaskCall({name: title, description: description, day: (date.getDate() + 1), month: date.getMonth(), year: date.getFullYear(), calendarId: calendarId}, function(data) {
-                        modal.get('boundingBox').one('.todo-portlet-loader').toggleClass('visible');
-                        modal.get('boundingBox').one('.add-submit').removeAttribute('disabled');
-                        me.updateTaskListUI(function() {
+                    me.addTaskCall(
+                		{
+                			name: title, 
+                			description: description, 
+                			day: (date.getDate() + 1), 
+                			month: date.getMonth(), 
+                			year: date.getFullYear(), 
+                			calendarId: calendarId,
+                			firstReminderType: undefined, // TODO use select element to get the reminders
+                			firstReminderDuration: undefined,
+                			firstReminderValue: undefined,
+                			secondReminderType: undefined,
+                			secondReminderDuration: undefined,
+                			secondReminderValue: undefined,
+                		},  function(data) {
+	                        modal.get('boundingBox').one('.todo-portlet-loader').toggleClass('visible');
+	                        modal.get('boundingBox').one('.add-submit').removeAttribute('disabled');
+	                        me.updateTaskListUI(function() {
                             me.openTaskGroup(data.taskId);
                         });
                         modal.get('boundingBox').one('form').reset();

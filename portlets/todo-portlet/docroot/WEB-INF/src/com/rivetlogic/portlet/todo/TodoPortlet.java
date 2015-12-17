@@ -18,18 +18,7 @@
 package com.rivetlogic.portlet.todo;
 
 import com.liferay.calendar.model.CalendarBooking;
-import com.liferay.calendar.model.CalendarBookingConstants;
-import com.liferay.calendar.model.CalendarResource;
 import com.liferay.calendar.service.CalendarBookingLocalServiceUtil;
-import com.liferay.calendar.service.CalendarLocalServiceUtil;
-import com.liferay.calendar.service.CalendarResourceLocalServiceUtil;
-import com.liferay.calendar.service.CalendarServiceUtil;
-import com.liferay.calendar.service.persistence.CalendarBookingFinderUtil;
-import com.liferay.calendar.service.persistence.CalendarBookingUtil;
-import com.liferay.calendar.util.comparator.CalendarNameComparator;
-import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -39,10 +28,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.model.User;
-import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
-import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
@@ -57,9 +43,9 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletResponse;
@@ -144,12 +130,16 @@ public class TodoPortlet extends MVCPortlet {
     
     private void addTask(HttpServletRequest request, JSONObject jsonObject) {
         Task task = createTaskFromRequest(request);
+        long[] reminders;
+        String[] remindersType;
         long calendarId = ParamUtil.getLong(request, TasksBean.JSON_TASK_DATA_CALENDAR_ID, TasksBean.UNDEFINED_ID);
         if (TodoValidator.validateNewTask(task)) {
             try {
             	// add task to liferay calendar only if calendarId is valid
             	if (calendarId != TasksBean.UNDEFINED_ID) {
-            		CalendarBooking cb = addCalendarBooking(request, task, calendarId);
+            		reminders = getReminders(request);
+            		remindersType = getRemindersType(request);
+            		CalendarBooking cb = addCalendarBooking(request, task, calendarId, reminders, remindersType);
             		task.setCalendarBookingId( cb == null? TasksBean.UNDEFINED_ID : cb.getCalendarBookingId() );
             	} else {
             		// if no calendar was selected, assing a default value to the field
@@ -242,7 +232,7 @@ public class TodoPortlet extends MVCPortlet {
         return calendar;
     }
         
-    private CalendarBooking addCalendarBooking(HttpServletRequest request, Task task, long calendarId) throws PortalException, SystemException {
+    private CalendarBooking addCalendarBooking(HttpServletRequest request, Task task, long calendarId, long[] reminders, String[] remindersType) throws PortalException, SystemException {
 
         Map<Locale, String> titleMap = new HashMap<Locale, String>();
 		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
@@ -253,23 +243,29 @@ public class TodoPortlet extends MVCPortlet {
         return CalendarBookingLocalServiceUtil.addCalendarBooking(PortalUtil.getUserId(request),
         	calendarId, new long[]{}, 0l, titleMap, descriptionMap,
 			StringPool.BLANK, task.getDate().getTime(),
-			task.getDate().getTime(), true, "", 0l, "", 0l, "",
+			task.getDate().getTime(), true, "", reminders[0], remindersType[0], reminders[1], remindersType[1],
 			ServiceContextFactory.getInstance(request));
     }
     
     private CalendarBooking updateCalendarBooking(HttpServletRequest request, Task task, long calendarBookingId, long calendarId) throws PortalException, SystemException {
     	CalendarBooking cb = (calendarBookingId == TasksBean.UNDEFINED_ID)? null : CalendarBookingLocalServiceUtil.getCalendarBooking(calendarBookingId);
+    	long[] reminders = getReminders(request);
+		String[] remindersType = getRemindersType(request);
     	if (cb != null) {
     		cb.setStartTime(task.getDate().getTime());
     		cb.setEndTime(task.getDate().getTime());
     		cb.setTitle(task.getName());
     		cb.setDescription(task.getDescription());
     		cb.setCalendarId(calendarId);
+    		cb.setFirstReminder(reminders[0]);
+    		cb.setFirstReminderType(remindersType[0]);
+    		cb.setSecondReminder(reminders[1]);
+    		cb.setSecondReminderType(remindersType[1]);
     		CalendarBookingLocalServiceUtil.updateCalendarBooking(cb);
     	} else {
-    		cb = addCalendarBooking(request, task, calendarId);
+    		cb = addCalendarBooking(request, task, calendarId, reminders, remindersType);
     	}
-    	
+    	    	
     	return cb;
     }
     
@@ -279,5 +275,32 @@ public class TodoPortlet extends MVCPortlet {
 		} catch (PortalException | SystemException e) {
 			LOG.error(e);
 		}
+    }
+    
+    private long[] getReminders(HttpServletRequest request) {
+    	long firstReminderValue = ParamUtil.getLong(request, TasksBean.JSON_TASK_FIRST_REMINDER_VALUE, DEFAULT_INT_VALUE);
+    	long firstReminderDuration = ParamUtil.getLong(request, TasksBean.JSON_TASK_FIRST_REMINDER_DURATION, DEFAULT_INT_VALUE);
+    	long secondReminderValue = ParamUtil.getLong(request, TasksBean.JSON_TASK_SECOND_REMINDER_VALUE, DEFAULT_INT_VALUE);
+    	long secondReminderDuration = ParamUtil.getLong(request, TasksBean.JSON_TASK_SECOND_REMINDER_DURATION, DEFAULT_INT_VALUE);
+    	
+    	return new long[] {
+    		firstReminderValue * firstReminderDuration,
+    		secondReminderValue * secondReminderDuration
+    	};
+    }
+    
+    /**
+     * Gets the type for each reminder. For now, the liferay's Calendar Portlet only supports 'email'.
+     * @param request HttpServletRequest to get the parameters from.
+     * @return An array of String with the corresponding type of each reminder.
+     */
+    private String[] getRemindersType(HttpServletRequest request) {
+    	String firstReminderType = ParamUtil.getString(request, TasksBean.JSON_TASK_FIRST_REMINDER_TYPE, StringPool.BACK_SLASH);
+    	String secondReminderType = ParamUtil.getString(request, TasksBean.JSON_TASK_SECOND_REMINDER_TYPE, StringPool.BACK_SLASH);
+    	
+    	return new String[] {
+    		firstReminderType,
+    		secondReminderType
+    	};
     }
 }

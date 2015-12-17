@@ -58,6 +58,12 @@ public class TasksBean {
     public static final String JSON_TASK_DATA_DATE = "date";
     public static final String JSON_TASK_DATA_CALENDAR_ID = "calendarId";
     public static final String JSON_TASK_DATA_CALENDAR_BOOKING_ID = "calendarBookingId";
+    public static final String JSON_TASK_FIRST_REMINDER_TYPE = "firstReminderType";
+    public static final String JSON_TASK_FIRST_REMINDER_DURATION = "firstReminderDuration";
+    public static final String JSON_TASK_FIRST_REMINDER_VALUE = "firstReminderValue";
+    public static final String JSON_TASK_SECOND_REMINDER_TYPE = "secondReminderType";
+    public static final String JSON_TASK_SECOND_REMINDER_DURATION = "secondReminderDuration";
+    public static final String JSON_TASK_SECOND_REMINDER_VALUE = "secondReminderValue";
     
     public static final String ACTION_KEY_MANAGE_BOOKINGS = "MANAGE_BOOKINGS";
     public static final int UNDEFINED_ID = -1;
