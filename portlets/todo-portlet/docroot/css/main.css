@@ -165,20 +165,26 @@
     display: none;
     padding: 0 2em;
 }
-.todo-portlet .edit-description {
-    width: 70%;
+.todo-portlet .edit .edit-description {
     font-size: 1em;
     padding: 1em;
     margin-top: .5em;
-    display: block
+    display: block;
+    height: 60px;
 }
 
-.todo-portlet .edit input[type=text],
-.todo-portlet .edit input[type=date] {
+.todo-portlet .edit input[type=text] {
+	height: 30px;
+}
+
+.todo-portlet .edit .field-required {
     padding: .5em;
     width: 70%;
     cursor: default;
-    background: white
+    background: white;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 /** added important to override importants added by aui **/
