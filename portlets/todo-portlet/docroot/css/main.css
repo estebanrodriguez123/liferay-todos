@@ -194,12 +194,48 @@
     padding-top: .5em
 }
 
-.add-to-calendar {
+/************************ Add Modal *************************/
+.add .controls .add-title, .add .controls .add-description, .add .controls .edit-time {
+	width: 100%;
+	-webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.add .controls .add-title, .add .controls .edit-time {
+	height: 30px;
+}
+
+/************** Add to Calendar, Add Reminders **************/
+
+.add-to-calendar, .add-reminder {
 	vertical-align: baseline;
 }
 
-.add-to-calendar input[type=checkbox] {
+.add-to-calendar input[type=checkbox], .add-reminder input[type=checkbox] {
 	vertical-align: baseline;
+}
+
+.reminders {
+	display: block;
+}
+
+.reminders.reminders-hidden {
+	display: none;
+}
+
+.reminders > .reminder > .add-reminder {
+	display: inline-block;
+}
+
+.reminders > .reminder > .reminder-value {
+	width: 40px;
+	margin-right: 4px;
+	margin-left: 4px;
+}
+
+.reminders > .reminder > .reminder-duration {
+	width: 100px;
 }
 
 /************************ Calendar **************************/
