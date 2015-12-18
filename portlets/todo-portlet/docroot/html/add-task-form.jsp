@@ -80,8 +80,8 @@ List<com.liferay.calendar.model.Calendar> manageableCalendars = CalendarServiceU
 		<label><liferay-ui:message key="edit-task-reminders" /></label>
 		<div class="reminder">
 			<label class="add-reminder"><input type="checkbox" class="chk-reminder" /> <liferay-ui:message key="edit-task-reminder-type"/></label> 
-			<input class="reminder-value" type="text"/>
-			<select class="reminder-duration">
+			<input class="reminder-value first-reminder-value" type="text"/>
+			<select class="reminder-duration first-reminder-duration">
 				<option value="60000"><liferay-ui:message key="edit-task-reminder-select-first-label"/></option>
 				<option value="3600000"><liferay-ui:message key="edit-task-reminder-select-second-label"/></option>
 				<option value="86400000"><liferay-ui:message key="edit-task-reminder-select-third-label"/></option>
@@ -91,8 +91,8 @@ List<com.liferay.calendar.model.Calendar> manageableCalendars = CalendarServiceU
 		
 		<div class="reminder">
 			<label class="add-reminder"><input type="checkbox" class="chk-reminder" /> <liferay-ui:message key="edit-task-reminder-type"/></label> 
-			<input class="reminder-value" type="text"/>
-			<select class="reminder-duration">
+			<input class="reminder-value second-reminder-value" type="text"/>
+			<select class="reminder-duration second-reminder-duration">
 				<option value="60000"><liferay-ui:message key="edit-task-reminder-select-first-label"/></option>
 				<option value="3600000"><liferay-ui:message key="edit-task-reminder-select-second-label"/></option>
 				<option value="86400000"><liferay-ui:message key="edit-task-reminder-select-third-label"/></option>
