@@ -31,6 +31,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
     
     var SELECT_CALENDAR = '.select-calendar';
     var CHECKBOX_CALENDAR = '.chk-calendar';
+    var CHECKBOX_REMINDER = '.chk-reminder';
     var UNDEFINED_CALENDAR_ID = -1; // matches the value of TasksBean.java
     var REMINDERS_BOX = '.reminders';
     var REMINDERS_HIDDEN_CLASS = 'reminders-hidden';
@@ -82,6 +83,8 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     var tasks = data[dataKeys[i]];
                     var markup = '';
                     var count = "("+tasks.length+")";
+                    var firstReminderSelectProperty = '';
+                    var secondReminderSelectProperty = '';
                     box.one(containerClasses[i]+'-tasks-count').set('innerHTML',count);
                     for (var j = 0; j < tasks.length; j++) {
                     	tasks[j].dateFieldType = dateFieldType;
@@ -89,6 +92,17 @@ AUI.add('todo-portlet', function (Y, NAME) {
                         if (tasks[j])
                         // checkbox
                         tasks[j].checked = (tasks[j].calendarId !== UNDEFINED_CALENDAR_ID)? "checked": "";
+                        // checkbox for reminders
+                        tasks[j].firstReminderChecked = (tasks[j].firstReminderValue !== 0)? "checked": "";
+                        tasks[j].secondReminderChecked = (tasks[j].secondReminderValue !== 0)? "checked": "";
+                        // reminders
+                        tasks[j].firstReminderValue = (tasks[j].firstReminderValue !== 0)? tasks[j].firstReminderValue / tasks[j].firstReminderDuration : "";
+                        tasks[j].secondReminderValue = (tasks[j].secondReminderValue !== 0)? tasks[j].secondReminderValue / tasks[j].secondReminderDuration: "";
+                        firstReminderSelectProperty = "first" + tasks[j].firstReminderDuration;
+                        tasks[j][firstReminderSelectProperty] = "selected";
+                        secondReminderSelectProperty = "second" + tasks[j].secondReminderDuration;
+                        tasks[j][secondReminderSelectProperty] = "selected";
+                         
                         // select
                         tasks[j][tasks[j].calendarId] = "selected";
                         markup += Y.Lang.sub(box.one('#' + me.get('portletNamespace') + 'task-list-item-template').get('innerHTML'), tasks[j]);
@@ -169,11 +183,20 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 // only disable the select when the task was not added to the liferay calendar
                 if (!node.one(CHECKBOX_CALENDAR).attr("checked")) {
                 	node.one(SELECT_CALENDAR).setAttribute("disabled", "disabled");
+                	// if select is disabled, hide the reminders container
+                	node.one(REMINDERS_BOX).addClass(REMINDERS_HIDDEN_CLASS);
                 }
                 
                 // Add to calendar checkbox on edit
                 node.one(CHECKBOX_CALENDAR).on('change', function (event) { 
                 	me.checkCalendarHandler(event, node.one(SELECT_CALENDAR));
+                	node.one(REMINDERS_BOX).toggleClass(REMINDERS_HIDDEN_CLASS);
+                });
+                
+                // Add reminders checkboxes on edit
+                node.all(CHECKBOX_REMINDER).on('change', function (event) {
+                	var reminderDiv = event.target.ancestor(REMINDER_BOX);
+                	me.checkReminderHandler(event, reminderDiv.one(REMINDER_VALUE), reminderDiv.one(REMINDER_DURATION));
                 });
             });
             /** Shows edit mode when clicking on a task **/
@@ -238,6 +261,10 @@ AUI.add('todo-portlet', function (Y, NAME) {
                         var title = element.edit.one('.edit-title').get('value');
                         var description = element.edit.one('.edit-description').get('value');
                         var date = element.edit.one('.lfr-input-date input').get('value');
+                        var firstReminderValue = me.getReminderValue(element.edit.one(FIRST_REMINDER_VALUE));
+                        var firstReminderDuration = me.getReminderValue(element.edit.one(FIRST_REMINDER_DURATION));
+                        var secondReminderValue = me.getReminderValue(element.edit.one(SECOND_REMINDER_VALUE));
+                        var secondReminderDuration = me.getReminderValue(element.edit.one(SECOND_REMINDER_DURATION));
                         
                         date = new Date(date);
                         
@@ -251,12 +278,12 @@ AUI.add('todo-portlet', function (Y, NAME) {
                         		year: date.getFullYear(),
                         		calendarId: calendarId, 
                         		calendarBookingId: calendarBookingId,
-                        		firstReminderType: undefined, //TODO use select element to get the reminders
-                    			firstReminderDuration: undefined,
-                    			firstReminderValue: undefined,
-                    			secondReminderType: undefined,
-                    			secondReminderDuration: undefined,
-                    			secondReminderValue: undefined,
+                        		firstReminderType: 'email',
+                    			firstReminderDuration: firstReminderDuration,
+                    			firstReminderValue: firstReminderValue,
+                    			secondReminderType: 'email',
+                    			secondReminderDuration: secondReminderDuration,
+                    			secondReminderValue: secondReminderValue,
                     		}, function() {
                     			me.updateTaskListUI(function() {
                                 me.openTaskGroup(id);
@@ -510,7 +537,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
             });
             
             // Add reminder checkbox on modal
-            modal.get('boundingBox').all('.chk-reminder').on('change', function (event) {
+            modal.get('boundingBox').all(CHECKBOX_REMINDER).on('change', function (event) {
             	// get the reminder parent div
             	var reminderDiv = event.target.ancestor(REMINDER_BOX);
             	// using the reminder div, get the input for the reminder value and the select for the reminder duration

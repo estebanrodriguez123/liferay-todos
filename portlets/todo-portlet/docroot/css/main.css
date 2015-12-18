@@ -187,6 +187,13 @@
     box-sizing: border-box;
 }
 
+.todo-portlet .edit .reminder-value {
+	-webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 40px;
+}
+
 /** added important to override importants added by aui **/
 .todo-portlet .edit.show {
     display: block!important
@@ -235,9 +242,9 @@
 }
 
 .reminders > .reminder > .reminder-value {
-	width: 40px;
-	margin-right: 4px;
-	margin-left: 4px;
+	width: 50px;
+	margin-right: 5px;
+	margin-left: 5px;
 }
 
 .reminders > .reminder > .reminder-duration {
