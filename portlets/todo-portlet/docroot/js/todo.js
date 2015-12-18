@@ -37,6 +37,10 @@ AUI.add('todo-portlet', function (Y, NAME) {
     var REMINDER_BOX = '.reminder';
     var REMINDER_VALUE = '.reminder-value';
     var REMINDER_DURATION = '.reminder-duration';
+    var FIRST_REMINDER_VALUE = '.first-reminder-value';
+    var FIRST_REMINDER_DURATION = '.first-reminder-duration';
+    var SECOND_REMINDER_VALUE = '.second-reminder-value';
+    var SECOND_REMINDER_DURATION = '.second-reminder-duration';
     
     Y.Todo = Y.Base.create('todo-portlet', Y.Base, [], {
 
@@ -305,6 +309,14 @@ AUI.add('todo-portlet', function (Y, NAME) {
         	return select.attr("disabled")? UNDEFINED_CALENDAR_ID : select.val();
         },
         
+        getReminderValue: function(inputReminder) {
+        	return inputReminder.attr("disabled")? 0: inputReminder.val();
+        },
+        
+        getReminderDuration: function(selectReminder) {
+        	return selectReminder.attr("disabled")? 0: selectReminder.val();
+        },
+        
         /**
          * Common ajax wrapper
          * 
@@ -435,6 +447,10 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 var description = modal.get('boundingBox').one('.add-description').get('value');
                 var date = modal.get('boundingBox').one('.lfr-input-date input').get('value');
                 var calendarId = me.getCalendarId(modal.get('boundingBox').one(SELECT_CALENDAR));
+                var firstReminderValue = me.getReminderValue(modal.get('boundingBox').one(FIRST_REMINDER_VALUE));
+                var firstReminderDuration = me.getReminderValue(modal.get('boundingBox').one(FIRST_REMINDER_DURATION));
+                var secondReminderValue = me.getReminderValue(modal.get('boundingBox').one(SECOND_REMINDER_VALUE));
+                var secondReminderDuration = me.getReminderValue(modal.get('boundingBox').one(SECOND_REMINDER_DURATION));
                 
                 e.preventDefault();
                 e.stopPropagation();
@@ -452,12 +468,12 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 			month: date.getMonth(), 
                 			year: date.getFullYear(), 
                 			calendarId: calendarId,
-                			firstReminderType: undefined, // TODO use select element to get the reminders
-                			firstReminderDuration: undefined,
-                			firstReminderValue: undefined,
-                			secondReminderType: undefined,
-                			secondReminderDuration: undefined,
-                			secondReminderValue: undefined,
+                			firstReminderType: 'email',
+                			firstReminderDuration: firstReminderDuration,
+                			firstReminderValue: firstReminderValue,
+                			secondReminderType: 'email',
+                			secondReminderDuration: secondReminderDuration,
+                			secondReminderValue: secondReminderValue,
                 		},  function(data) {
 	                        modal.get('boundingBox').one('.todo-portlet-loader').toggleClass('visible');
 	                        modal.get('boundingBox').one('.add-submit').removeAttribute('disabled');
