@@ -32,6 +32,11 @@ AUI.add('todo-portlet', function (Y, NAME) {
     var SELECT_CALENDAR = '.select-calendar';
     var CHECKBOX_CALENDAR = '.chk-calendar';
     var UNDEFINED_CALENDAR_ID = -1; // matches the value of TasksBean.java
+    var REMINDERS_BOX = '.reminders';
+    var REMINDERS_HIDDEN_CLASS = 'reminders-hidden';
+    var REMINDER_BOX = '.reminder';
+    var REMINDER_VALUE = '.reminder-value';
+    var REMINDER_DURATION = '.reminder-duration';
     
     Y.Todo = Y.Base.create('todo-portlet', Y.Base, [], {
 
@@ -162,8 +167,9 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 	node.one(SELECT_CALENDAR).setAttribute("disabled", "disabled");
                 }
                 
+                // Add to calendar checkbox on edit
                 node.one(CHECKBOX_CALENDAR).on('change', function (event) { 
-                	me.checkHandler(event, node.one(SELECT_CALENDAR));
+                	me.checkCalendarHandler(event, node.one(SELECT_CALENDAR));
                 });
             });
             /** Shows edit mode when clicking on a task **/
@@ -480,19 +486,52 @@ AUI.add('todo-portlet', function (Y, NAME) {
             	}
             });
             
+            // Add to calendar checkbox on modal
             modal.get('boundingBox').one(CHECKBOX_CALENDAR).on('change', function (event) {
-            	me.checkHandler(event, modal.get('boundingBox').one(SELECT_CALENDAR));
+            	me.checkCalendarHandler(event, modal.get('boundingBox').one(SELECT_CALENDAR));
+            	// toggling the reminders div when checking or unchecking the add to liferay calendar checkbox
+            	modal.get('boundingBox').one(REMINDERS_BOX).toggleClass(REMINDERS_HIDDEN_CLASS);
             });
+            
+            // Add reminder checkbox on modal
+            modal.get('boundingBox').all('.chk-reminder').on('change', function (event) {
+            	// get the reminder parent div
+            	var reminderDiv = event.target.ancestor(REMINDER_BOX);
+            	// using the reminder div, get the input for the reminder value and the select for the reminder duration
+            	me.checkReminderHandler(event, reminderDiv.one(REMINDER_VALUE), reminderDiv.one(REMINDER_DURATION));
+            });
+            
+            // Initialy the reminders controls are disabled
+            modal.get('boundingBox').all(REMINDER_VALUE).setAttribute('disabled', 'disabled');
+            modal.get('boundingBox').all(REMINDER_DURATION).setAttribute('disabled', 'disabled');
         },
         
         /** Handler for the checkbox to enable or disabled the calendar select **/
-        checkHandler: function (event, selectCalendar) {
+        checkCalendarHandler: function (event, selectCalendar) {
         	if (selectCalendar) {
         		if (selectCalendar.attr("disabled")) {
 	        		selectCalendar.removeAttribute("disabled");
 	        	} else {
 	        		selectCalendar.setAttribute("disabled", "disabled");
 	        	}
+        	}
+        },
+        
+        checkReminderHandler: function (event, inputReminder, selectReminder) {
+        	if (inputReminder && selectReminder) {
+        		// toggle the disabled attribute for the input
+        		if (inputReminder.attr("disabled")) {
+        			inputReminder.removeAttribute("disabled");
+        		} else {
+        			inputReminder.setAttribute("disabled", "disabled");
+        		}
+        		
+        		// toggle the disabled attribute for the select
+        		if (selectReminder.attr("disabled")) {
+        			selectReminder.removeAttribute("disabled");
+        		} else {
+        			selectReminder.setAttribute("disabled", "disabled");
+        		}
         	}
         },
         
