@@ -68,6 +68,31 @@
         		</div>
 			</div>
 
+			<div class="control-group reminders {remindersClass}">
+				<label><liferay-ui:message key="edit-task-reminders" /></label>
+				<div class="reminder">
+					<label class="add-reminder"><input {firstReminderChecked} type="checkbox" class="chk-reminder" /> <liferay-ui:message key="edit-task-reminder-type"/></label> 
+					<input class="reminder-value first-reminder-value" type="text" value="{firstReminderValue}"/>
+					<select class="reminder-duration first-reminder-duration">
+						<option {first60000} value="60000"><liferay-ui:message key="edit-task-reminder-select-first-label"/></option>
+						<option {first3600000} value="3600000"><liferay-ui:message key="edit-task-reminder-select-second-label"/></option>
+						<option {first86400000} value="86400000"><liferay-ui:message key="edit-task-reminder-select-third-label"/></option>
+						<option {first604800000} value="604800000"><liferay-ui:message key="edit-task-reminder-select-fourth-label"/></option>
+					</select>	
+				</div>
+				
+				<div class="reminder">
+					<label class="add-reminder"><input {secondReminderChecked} type="checkbox" class="chk-reminder" /> <liferay-ui:message key="edit-task-reminder-type"/></label> 
+					<input class="reminder-value second-reminder-value" type="text" value="{secondReminderValue}"/>
+					<select class="reminder-duration second-reminder-duration">
+						<option {second60000} value="60000"><liferay-ui:message key="edit-task-reminder-select-first-label"/></option>
+						<option {second3600000} value="3600000"><liferay-ui:message key="edit-task-reminder-select-second-label"/></option>
+						<option {second86400000} value="86400000"><liferay-ui:message key="edit-task-reminder-select-third-label"/></option>
+						<option {second604800000} value="604800000"><liferay-ui:message key="edit-task-reminder-select-fourth-label"/></option>
+					</select>	
+				</div>
+			</div>
+
        
             <button class="btn edit-submit"><liferay-ui:message key="edit-task-submit" /></button>
             <button class="btn edit-cancel"><liferay-ui:message key="edit-task-cancel" /></button>
