@@ -187,6 +187,17 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 	node.one(REMINDERS_BOX).addClass(REMINDERS_HIDDEN_CLASS);
                 }
                 
+                // reminder select and input status
+                node.all(CHECKBOX_REMINDER).each(function (reminder) {
+                	// no reminder was set
+                	if (!reminder.attr('checked')) {
+                		// disable the input and select elements for the reminder
+                		var reminderDiv = reminder.ancestor(REMINDER_BOX);
+                		reminderDiv.one(REMINDER_VALUE).setAttribute('disabled', 'disabled');
+                		reminderDiv.one(REMINDER_DURATION).setAttribute('disabled', 'disabled');
+                	}
+                });
+                
                 // Add to calendar checkbox on edit
                 node.one(CHECKBOX_CALENDAR).on('change', function (event) { 
                 	me.checkCalendarHandler(event, node.one(SELECT_CALENDAR));
