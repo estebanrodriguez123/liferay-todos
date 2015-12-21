@@ -36,6 +36,7 @@ public class TaskSoap implements Serializable {
 		soapModel.setDescription(model.getDescription());
 		soapModel.setDate(model.getDate());
 		soapModel.setCompleted(model.getCompleted());
+		soapModel.setCalendarBookingId(model.getCalendarBookingId());
 
 		return soapModel;
 	}
@@ -136,10 +137,19 @@ public class TaskSoap implements Serializable {
 		_completed = completed;
 	}
 
+	public long getCalendarBookingId() {
+		return _calendarBookingId;
+	}
+
+	public void setCalendarBookingId(long calendarBookingId) {
+		_calendarBookingId = calendarBookingId;
+	}
+
 	private long _taskId;
 	private long _userId;
 	private String _name;
 	private String _description;
 	private Date _date;
 	private Boolean _completed;
+	private long _calendarBookingId;
 }

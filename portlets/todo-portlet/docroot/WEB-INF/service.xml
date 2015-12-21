@@ -14,7 +14,7 @@
 		<column name="description" type="String" />
 		<column name="date" type="Date" />
 		<column name="completed" type="Boolean" />
-		
+		<column name="calendarBookingId" type="long"></column>
 		<!-- Order -->
         <order>
             <order-column name="date" order-by="asc" />
