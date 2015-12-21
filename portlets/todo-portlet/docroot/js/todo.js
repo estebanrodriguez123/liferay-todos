@@ -496,6 +496,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 if (modal.get('boundingBox').all('.error').size() == 0 && Y.Lang.trim(title) != '' && 
                         Y.Lang.trim(description) != '' && Y.Lang.trim(date) != '') {
                     date = new Date(date);
+                    date.setHours(0,0,0,0); //starts at midnight
                     modal.get('boundingBox').one('.todo-portlet-loader').toggleClass('visible');
                     modal.get('boundingBox').one('.add-submit').setAttribute('disabled', 'true');
                     me.addTaskCall(
