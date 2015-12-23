@@ -272,7 +272,7 @@ public class TodoPortlet extends MVCPortlet {
     private void deleteCalendarBooking(long calendarBookingId) {
     	try {
 			CalendarBookingLocalServiceUtil.deleteCalendarBooking(calendarBookingId);
-		} catch (PortalException | SystemException e) {
+		} catch (Exception e) {
 			LOG.error(e);
 		}
     }
