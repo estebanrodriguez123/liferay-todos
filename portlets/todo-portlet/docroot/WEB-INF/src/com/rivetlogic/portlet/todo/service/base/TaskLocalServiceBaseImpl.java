@@ -290,6 +290,25 @@ public abstract class TaskLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
+	 * Returns the task remote service.
+	 *
+	 * @return the task remote service
+	 */
+	public com.rivetlogic.portlet.todo.service.TaskService getTaskService() {
+		return taskService;
+	}
+
+	/**
+	 * Sets the task remote service.
+	 *
+	 * @param taskService the task remote service
+	 */
+	public void setTaskService(
+		com.rivetlogic.portlet.todo.service.TaskService taskService) {
+		this.taskService = taskService;
+	}
+
+	/**
 	 * Returns the task persistence.
 	 *
 	 * @return the task persistence
@@ -485,6 +504,8 @@ public abstract class TaskLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 	@BeanReference(type = com.rivetlogic.portlet.todo.service.TaskLocalService.class)
 	protected com.rivetlogic.portlet.todo.service.TaskLocalService taskLocalService;
+	@BeanReference(type = com.rivetlogic.portlet.todo.service.TaskService.class)
+	protected com.rivetlogic.portlet.todo.service.TaskService taskService;
 	@BeanReference(type = TaskPersistence.class)
 	protected TaskPersistence taskPersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)

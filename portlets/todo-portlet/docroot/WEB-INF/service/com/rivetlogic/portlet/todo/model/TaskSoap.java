@@ -21,9 +21,10 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * This class is used by SOAP remote services.
+ * This class is used by SOAP remote services, specifically {@link com.rivetlogic.portlet.todo.service.http.TaskServiceSoap}.
  *
  * @author Christopher Jimenez
+ * @see com.rivetlogic.portlet.todo.service.http.TaskServiceSoap
  * @generated
  */
 public class TaskSoap implements Serializable {

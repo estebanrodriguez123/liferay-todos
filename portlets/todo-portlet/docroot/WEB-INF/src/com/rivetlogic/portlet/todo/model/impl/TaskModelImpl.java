@@ -16,6 +16,7 @@ package com.rivetlogic.portlet.todo.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
@@ -31,13 +32,16 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import com.rivetlogic.portlet.todo.model.Task;
 import com.rivetlogic.portlet.todo.model.TaskModel;
+import com.rivetlogic.portlet.todo.model.TaskSoap;
 
 import java.io.Serializable;
 
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,6 +57,7 @@ import java.util.Map;
  * @see com.rivetlogic.portlet.todo.model.TaskModel
  * @generated
  */
+@JSON(strict = true)
 public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -87,6 +92,51 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 			true);
 	public static long USERID_COLUMN_BITMASK = 1L;
 	public static long DATE_COLUMN_BITMASK = 2L;
+
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 */
+	public static Task toModel(TaskSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		Task model = new TaskImpl();
+
+		model.setTaskId(soapModel.getTaskId());
+		model.setUserId(soapModel.getUserId());
+		model.setName(soapModel.getName());
+		model.setDescription(soapModel.getDescription());
+		model.setDate(soapModel.getDate());
+		model.setCompleted(soapModel.getCompleted());
+		model.setCalendarBookingId(soapModel.getCalendarBookingId());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 */
+	public static List<Task> toModels(TaskSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<Task> models = new ArrayList<Task>(soapModels.length);
+
+		for (TaskSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.util.service.ServiceProps.get(
 				"lock.expiration.time.com.rivetlogic.portlet.todo.model.Task"));
 
@@ -183,6 +233,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		}
 	}
 
+	@JSON
 	@Override
 	public long getTaskId() {
 		return _taskId;
@@ -193,6 +244,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		_taskId = taskId;
 	}
 
+	@JSON
 	@Override
 	public long getUserId() {
 		return _userId;
@@ -225,6 +277,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		return _originalUserId;
 	}
 
+	@JSON
 	@Override
 	public String getName() {
 		if (_name == null) {
@@ -240,6 +293,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		_name = name;
 	}
 
+	@JSON
 	@Override
 	public String getDescription() {
 		if (_description == null) {
@@ -255,6 +309,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		_description = description;
 	}
 
+	@JSON
 	@Override
 	public Date getDate() {
 		return _date;
@@ -267,6 +322,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		_date = date;
 	}
 
+	@JSON
 	@Override
 	public Boolean getCompleted() {
 		return _completed;
@@ -277,6 +333,7 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		_completed = completed;
 	}
 
+	@JSON
 	@Override
 	public long getCalendarBookingId() {
 		return _calendarBookingId;
