@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.messaging.Message;
 
 import com.rivetlogic.portlet.todo.service.ClpSerializer;
 import com.rivetlogic.portlet.todo.service.TaskLocalServiceUtil;
+import com.rivetlogic.portlet.todo.service.TaskServiceUtil;
 
 /**
  * @author Christopher Jimenez
@@ -36,6 +37,8 @@ public class ClpMessageListener extends BaseMessageListener {
 		if (command.equals("undeploy") &&
 				servletContextName.equals(getServletContextName())) {
 			TaskLocalServiceUtil.clearService();
+
+			TaskServiceUtil.clearService();
 		}
 	}
 }

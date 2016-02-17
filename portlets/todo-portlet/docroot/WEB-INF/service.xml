@@ -4,7 +4,7 @@
 	<author>Christopher Jimenez</author>
 	<namespace>todo</namespace>
 
-	<entity name="Task" local-service="true" remote-service="false">
+	<entity name="Task" local-service="true" remote-service="true">
 		<!-- PK fields -->
 		<column name="taskId" type="long" primary="true" />
 		<!-- FK fields -->
