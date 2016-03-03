@@ -17,6 +17,7 @@
  */
 --%>
 
+
 <script id="<portlet:namespace/>task-list-item-template" type="text/x-html-template">
 <li id="task-{taskId}" class="{done}">
     <div class="activity">
@@ -29,7 +30,8 @@
     </div>
     <div class="edit">
         <form>
-            <input type="hidden" value="{taskId}" />
+            <input class="edit-task-id" type="hidden" value="{taskId}" />
+			<input class="edit-calendar-booking-id" type="hidden" value="{calendarBookingId}" />
             <div class="control-group">
                 <label class="control-label" for="title"><liferay-ui:message key="edit-task-title" /></label>
                 <div class="controls">
@@ -50,6 +52,46 @@
                     <input id="taskCal{taskId}" name="time" type="{dateFieldType}" class="edit-time" value="{date}"></input>
                 </div>
             </div>
+
+			<div class="control-group">
+				<label class="add-to-calendar"><input {checked} type="checkbox" class="chk-calendar" /> <liferay-ui:message key="edit-task-add-to-calendar" /></label>
+       			<div class="controls">            
+					<select class="select-calendar">
+						<%
+						for (com.liferay.calendar.model.Calendar curCalendar : manageableCalendars) {
+						%>
+						<option {<%= curCalendar.getCalendarId() %>} value="<%= curCalendar.getCalendarId() %>"><%= HtmlUtil.escape(curCalendar.getName(locale)) %></option>
+						<%
+						}
+						%>
+					</select>			
+        		</div>
+			</div>
+
+			<div class="control-group reminders {remindersClass}">
+				<label><liferay-ui:message key="edit-task-reminders" /></label>
+				<div class="reminder">
+					<label class="add-reminder"><input {firstReminderChecked} type="checkbox" class="chk-reminder" /> <liferay-ui:message key="edit-task-reminder-type"/></label> 
+					<input class="reminder-value first-reminder-value" type="text" value="{firstReminderValue}"/>
+					<select class="reminder-duration first-reminder-duration">
+						<option {first60000} value="60000"><liferay-ui:message key="edit-task-reminder-select-first-label"/></option>
+						<option {first3600000} value="3600000"><liferay-ui:message key="edit-task-reminder-select-second-label"/></option>
+						<option {first86400000} value="86400000"><liferay-ui:message key="edit-task-reminder-select-third-label"/></option>
+						<option {first604800000} value="604800000"><liferay-ui:message key="edit-task-reminder-select-fourth-label"/></option>
+					</select>	
+				</div>
+				
+				<div class="reminder">
+					<label class="add-reminder"><input {secondReminderChecked} type="checkbox" class="chk-reminder" /> <liferay-ui:message key="edit-task-reminder-type"/></label> 
+					<input class="reminder-value second-reminder-value" type="text" value="{secondReminderValue}"/>
+					<select class="reminder-duration second-reminder-duration">
+						<option {second60000} value="60000"><liferay-ui:message key="edit-task-reminder-select-first-label"/></option>
+						<option {second3600000} value="3600000"><liferay-ui:message key="edit-task-reminder-select-second-label"/></option>
+						<option {second86400000} value="86400000"><liferay-ui:message key="edit-task-reminder-select-third-label"/></option>
+						<option {second604800000} value="604800000"><liferay-ui:message key="edit-task-reminder-select-fourth-label"/></option>
+					</select>	
+				</div>
+			</div>
 
        
             <button class="btn edit-submit"><liferay-ui:message key="edit-task-submit" /></button>

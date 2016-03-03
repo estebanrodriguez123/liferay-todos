@@ -109,7 +109,12 @@
     font-size: 1.4em;
 	position: absolute;
 	right: 1em;
-	top: 30%;
+	top: 50%;
+	-webkit-transform: translateY(-50%);
+  	-moz-transform:    translateY(-50%);
+  	-ms-transform:     translateY(-50%);
+  	-o-transform:      translateY(-50%);
+  	transform:         translateY(-50%);
 }
 
 .todo-portlet .btn.activity-delete:hover {
@@ -117,7 +122,7 @@
     color: white
 }
 
-.todo-portlet .btn.activity-finished,.btn.activity-undo {
+.todo-portlet .btn.activity-finished,.btn.activity-undo,.btn.activity-undo.icon-check {
     background-image: none;
     border: 0;
     color: #385;
@@ -159,26 +164,49 @@
     right: 0;
 }
 
+/* Hide the check button if the task is not done yet */
+.btn.activity-undo.icon-check {
+	display: none;
+}
+
+/* Only show the check button when the task was marked as done */
+.done .btn.activity-undo.icon-check {
+	display: block;
+}
+
 /******************** Edit/Add Section **********************/
 
 .todo-portlet .edit {
     display: none;
     padding: 0 2em;
 }
-.todo-portlet .edit-description {
-    width: 70%;
+.todo-portlet .edit .edit-description {
     font-size: 1em;
     padding: 1em;
     margin-top: .5em;
-    display: block
+    display: block;
+    height: 60px;
 }
 
-.todo-portlet .edit input[type=text],
-.todo-portlet .edit input[type=date] {
+.todo-portlet .edit input[type=text] {
+	height: 30px;
+}
+
+.todo-portlet .edit .field-required {
     padding: .5em;
     width: 70%;
     cursor: default;
-    background: white
+    background: white;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.todo-portlet .edit .reminder-value {
+	-webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 40px;
 }
 
 /** added important to override importants added by aui **/
@@ -193,6 +221,51 @@
 .todo-portlet .buttons {
     padding-top: .5em
 }
+
+/************************ Add Modal *************************/
+.add .controls .add-title, .add .controls .add-description, .add .controls .edit-time {
+	width: 100%;
+	-webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.add .controls .add-title, .add .controls .edit-time {
+	height: 30px;
+}
+
+/************** Add to Calendar, Add Reminders **************/
+
+.add-to-calendar, .add-reminder {
+	vertical-align: baseline;
+}
+
+.add-to-calendar input[type=checkbox], .add-reminder input[type=checkbox] {
+	vertical-align: baseline;
+}
+
+.reminders {
+	display: block;
+}
+
+.reminders.reminders-hidden {
+	display: none;
+}
+
+.reminders > .reminder > .add-reminder {
+	display: inline-block;
+}
+
+.reminders > .reminder > .reminder-value {
+	width: 50px;
+	margin-right: 5px;
+	margin-left: 5px;
+}
+
+.reminders > .reminder > .reminder-duration {
+	width: 100px;
+}
+
 /************************ Calendar **************************/
 .yui3-calendarnav-prevmonth:before {
     content: "\f053";

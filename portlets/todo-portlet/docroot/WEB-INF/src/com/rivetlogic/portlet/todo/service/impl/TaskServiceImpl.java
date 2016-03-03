@@ -1,8 +1,4 @@
 /**
- * Copyright (c) 2014 Rivet Logic Corporation. All rights reserved.
- */
-
-/**
  * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
@@ -22,39 +18,34 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.rivetlogic.portlet.todo.model.Task;
-import com.rivetlogic.portlet.todo.service.base.TaskLocalServiceBaseImpl;
+import com.rivetlogic.portlet.todo.service.base.TaskServiceBaseImpl;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The implementation of the task local service.
- * 
+ * The implementation of the task remote service.
+ *
  * <p>
- * All custom service methods should be put in this class. Whenever methods are
- * added, rerun ServiceBuilder to copy their definitions into the
- * {@link com.rivetlogic.portlet.todo.service.TaskLocalService} interface.
- * 
+ * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.rivetlogic.portlet.todo.service.TaskService} interface.
+ *
  * <p>
- * This is a local service. Methods of this service will not have security
- * checks based on the propagated JAAS credentials because this service can only
- * be accessed from within the same VM.
+ * This is a remote service. Methods of this service are expected to have security checks based on the propagated JAAS credentials because this service can be accessed remotely.
  * </p>
- * 
+ *
  * @author Christopher Jimenez
- * @see com.rivetlogic.portlet.todo.service.base.TaskLocalServiceBaseImpl
- * @see com.rivetlogic.portlet.todo.service.TaskLocalServiceUtil
+ * @see com.rivetlogic.portlet.todo.service.base.TaskServiceBaseImpl
+ * @see com.rivetlogic.portlet.todo.service.TaskServiceUtil
  */
-public class TaskLocalServiceImpl extends TaskLocalServiceBaseImpl {
-    /*
-     * NOTE FOR DEVELOPERS:
-     * 
-     * Never reference this interface directly. Always use {@link
-     * com.rivetlogic.portlet.todo.service.TaskLocalServiceUtil} to access the
-     * task local service.
-     */
-    private static final Log LOG = LogFactoryUtil.getLog(TaskLocalServiceImpl.class);
-    
+public class TaskServiceImpl extends TaskServiceBaseImpl {
+	/*
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never reference this interface directly. Always use {@link com.rivetlogic.portlet.todo.service.TaskServiceUtil} to access the task remote service.
+	 */
+
+    private static final Log LOG = LogFactoryUtil.getLog(TaskServiceImpl.class);
+
     public Task createTask(Task task) throws SystemException {
         Task newTask = taskPersistence.create(counterLocalService.increment(Task.class.getName()));
         newTask.setCompleted(task.getCompleted());
@@ -66,7 +57,7 @@ public class TaskLocalServiceImpl extends TaskLocalServiceBaseImpl {
         taskPersistence.update(newTask);
         return newTask;
     }
-    
+
     public List<Task> getTaskByUserId(Long userId) {
         List<Task> tasks = new ArrayList<Task>();
         try {

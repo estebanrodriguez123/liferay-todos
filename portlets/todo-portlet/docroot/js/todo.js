@@ -28,6 +28,21 @@ AUI.add('todo-portlet', function (Y, NAME) {
             required: true
           }
     };
+    
+    var SELECT_CALENDAR = '.select-calendar';
+    var CHECKBOX_CALENDAR = '.chk-calendar';
+    var CHECKBOX_REMINDER = '.chk-reminder';
+    var UNDEFINED_CALENDAR_ID = -1; // matches the value of TasksBean.java
+    var REMINDERS_BOX = '.reminders';
+    var REMINDERS_HIDDEN_CLASS = 'reminders-hidden';
+    var REMINDER_BOX = '.reminder';
+    var REMINDER_VALUE = '.reminder-value';
+    var REMINDER_DURATION = '.reminder-duration';
+    var FIRST_REMINDER_VALUE = '.first-reminder-value';
+    var FIRST_REMINDER_DURATION = '.first-reminder-duration';
+    var SECOND_REMINDER_VALUE = '.second-reminder-value';
+    var SECOND_REMINDER_DURATION = '.second-reminder-duration';
+    
     Y.Todo = Y.Base.create('todo-portlet', Y.Base, [], {
 
         lis: null,
@@ -68,11 +83,31 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     var tasks = data[dataKeys[i]];
                     var markup = '';
                     var count = "("+tasks.length+")";
+                    var firstReminderSelectProperty = '';
+                    var secondReminderSelectProperty = '';
                     box.one(containerClasses[i]+'-tasks-count').set('innerHTML',count);
                     for (var j = 0; j < tasks.length; j++) {
-                        tasks[j].dateFieldType = dateFieldType;
+                    	tasks[j].dateFieldType = dateFieldType;
                         tasks[j].done = (tasks[j].isCompleted) ? "done" : "";
+                        if (tasks[j])
+                        // checkbox
+                        tasks[j].checked = (tasks[j].calendarId !== UNDEFINED_CALENDAR_ID)? "checked": "";
+                        // checkbox for reminders
+                        tasks[j].firstReminderChecked = (tasks[j].firstReminderValue !== 0)? "checked": "";
+                        tasks[j].secondReminderChecked = (tasks[j].secondReminderValue !== 0)? "checked": "";
+                        // reminders
+                        tasks[j].firstReminderValue = (tasks[j].firstReminderValue !== 0)? tasks[j].firstReminderValue / tasks[j].firstReminderDuration : "";
+                        tasks[j].secondReminderValue = (tasks[j].secondReminderValue !== 0)? tasks[j].secondReminderValue / tasks[j].secondReminderDuration: "";
+                        firstReminderSelectProperty = "first" + tasks[j].firstReminderDuration;
+                        tasks[j][firstReminderSelectProperty] = "selected";
+                        secondReminderSelectProperty = "second" + tasks[j].secondReminderDuration;
+                        tasks[j][secondReminderSelectProperty] = "selected";
+                         
+                        // select
+                        tasks[j][tasks[j].calendarId] = "selected";
                         markup += Y.Lang.sub(box.one('#' + me.get('portletNamespace') + 'task-list-item-template').get('innerHTML'), tasks[j]);
+                        // removed text that was not substituted
+                        markup = markup.replace(/{\w+}/g, "");
                     }
                     box.one('.tasks' + containerClasses[i]).empty();
                     box.one('.tasks' + containerClasses[i]).append(markup);
@@ -95,23 +130,22 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 on: {
                     disabledChange: function(event) {
 
-                    },
-                    selectionChange: function(event) {
-                        Y.one(trigger).set('value', event.newSelection[0]);
                     }
+                    // remove validation which fails when the value is changed through javascript
+                    // and not by the user, as in this case
                 },
                 after: {
                     selectionChange: function(event) {
-                        var group = Y.one(trigger).ancestor('.control-group');
+                        var group = Y.one(".lfr-input-date").get("parentNode");
 
-                        group.removeClass("error").addClass("success");
+                            group.removeClass("error").addClass("success");
 
-                        try {
-                            group.one(".help-inline").remove(false);
-                        }
-                        catch(e) {
+                            try {
+                                group.one(".help-inline").remove(false);
+                            }
+                            catch(e) {
 
-                        }
+                            }
                         
                     }
                 },
@@ -142,17 +176,47 @@ AUI.add('todo-portlet', function (Y, NAME) {
             this.undo = box.all(".activity-undo");
             this.inputs = box.all(".edit input, .edit button, .edit textarea");
             
-            /* initializes calendar */
+            /* initializes calendar and select */
             box.all(".tasks li").each(function(node) {
                 me._createCalendar('#' + node.one('.edit-time').get('id'));
+                
+                // only disable the select when the task was not added to the liferay calendar
+                if (!node.one(CHECKBOX_CALENDAR).attr("checked")) {
+                	node.one(SELECT_CALENDAR).setAttribute("disabled", "disabled");
+                	// if select is disabled, hide the reminders container
+                	node.one(REMINDERS_BOX).addClass(REMINDERS_HIDDEN_CLASS);
+                }
+                
+                // reminder select and input status
+                node.all(CHECKBOX_REMINDER).each(function (reminder) {
+                	// no reminder was set
+                	if (!reminder.attr('checked')) {
+                		// disable the input and select elements for the reminder
+                		var reminderDiv = reminder.ancestor(REMINDER_BOX);
+                		reminderDiv.one(REMINDER_VALUE).setAttribute('disabled', 'disabled');
+                		reminderDiv.one(REMINDER_DURATION).setAttribute('disabled', 'disabled');
+                	}
+                });
+                
+                // Add to calendar checkbox on edit
+                node.one(CHECKBOX_CALENDAR).on('change', function (event) { 
+                	me.checkCalendarHandler(event, node.one(SELECT_CALENDAR));
+                	node.one(REMINDERS_BOX).toggleClass(REMINDERS_HIDDEN_CLASS);
+                });
+                
+                // Add reminders checkboxes on edit
+                node.all(CHECKBOX_REMINDER).on('change', function (event) {
+                	var reminderDiv = event.target.ancestor(REMINDER_BOX);
+                	me.checkReminderHandler(event, reminderDiv.one(REMINDER_VALUE), reminderDiv.one(REMINDER_DURATION));
+                });
             });
             /** Shows edit mode when clicking on a task **/
             this.activities.each(function (activity) {
                 activity.on("click", function () {
                     var element = me.getMembers(this.get("parentNode"));
-
                     element.activity.addClass("hide");
                     element.edit.addClass("show");
+                    
                     //element.titleInput.set("value",element.title.get("text"));
                     //element.timeInput.set("value",element.time.get("text"));
                 });
@@ -175,7 +239,14 @@ AUI.add('todo-portlet', function (Y, NAME) {
 	                    var oldCount = parseInt(oldCountStr);
 	                    var newCount = (oldCount != NaN? oldCount-1:0);
 	                    var newCountStr = "("+newCount+")";
-	                    me.deleteTaskCall({taskId: element.edit.one('input[type="hidden"]').get('value')}, function() {
+	                    var id = element.edit.one('.edit-task-id').get('value');
+	                    var calendarBookingId = element.edit.one('.edit-calendar-booking-id').get('value');
+	                    
+	                    me.deleteTaskCall(
+                    		{
+                    			taskId: id,
+                    			calendarBookingId: calendarBookingId
+                    		}, function() {
 	                        element.li.remove(true);
 	                        listHeader.one('.taskscount').set('innerHTML', newCountStr);
 	                    });
@@ -191,26 +262,45 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     rules: TASK_VALIDATION_RULES
                 });
                 button.on("click", function (e) {
-                    cont.all('input:not(.edit-time),textarea').each(function(n) {
-                        n.simulate('blur'); 
-                    });
+                    e.preventDefault();
+                    e.stopPropagation();
                     if (cont.all('.error').size() == 0) {
                         var element = me.getMembers(this.get("parentNode").get("parentNode").get("parentNode"));
-                        var id = element.edit.one('input[type="hidden"]').get('value');
+                        var id = element.edit.one('.edit-task-id').get('value');
+                        var calendarId = me.getCalendarId(element.selectCalendar);
+                        var calendarBookingId = element.edit.one('.edit-calendar-booking-id').get('value');
                         var title = element.edit.one('.edit-title').get('value');
                         var description = element.edit.one('.edit-description').get('value');
                         var date = element.edit.one('.lfr-input-date input').get('value');
+                        var firstReminderValue = me.getReminderValue(element.edit.one(FIRST_REMINDER_VALUE));
+                        var firstReminderDuration = me.getReminderValue(element.edit.one(FIRST_REMINDER_DURATION));
+                        var secondReminderValue = me.getReminderValue(element.edit.one(SECOND_REMINDER_VALUE));
+                        var secondReminderDuration = me.getReminderValue(element.edit.one(SECOND_REMINDER_DURATION));
                         
                         date = new Date(date);
                         
-                        me.updateTaskCall({taskId: id, name: title, description: description, day: (date.getDate() + 1), month: date.getMonth(), year: date.getFullYear()}, function() {
-                            me.updateTaskListUI(function() {
+                        me.updateTaskCall(
+                    		{
+                        		taskId: id, 
+                        		name: title, 
+                        		description: description, 
+                        		day: (date.getDate() + 1), 
+                        		month: date.getMonth(), 
+                        		year: date.getFullYear(),
+                        		calendarId: calendarId, 
+                        		calendarBookingId: calendarBookingId,
+                        		firstReminderType: 'email',
+                    			firstReminderDuration: firstReminderDuration,
+                    			firstReminderValue: firstReminderValue,
+                    			secondReminderType: 'email',
+                    			secondReminderDuration: secondReminderDuration,
+                    			secondReminderValue: secondReminderValue,
+                    		}, function() {
+                    			me.updateTaskListUI(function() {
                                 me.openTaskGroup(id);
                             });
                         });
                     }
-                    e.preventDefault();
-                    e.stopPropagation();
                 });
             });
 
@@ -253,6 +343,18 @@ AUI.add('todo-portlet', function (Y, NAME) {
             });
         },
         
+        getCalendarId: function(select) {
+        	return select.attr("disabled")? UNDEFINED_CALENDAR_ID : select.val();
+        },
+        
+        getReminderValue: function(inputReminder) {
+        	return inputReminder.attr("disabled")? 0: inputReminder.val();
+        },
+        
+        getReminderDuration: function(selectReminder) {
+        	return selectReminder.attr("disabled")? 0: selectReminder.val();
+        },
+        
         /**
          * Common ajax wrapper
          * 
@@ -265,6 +367,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
          */
         executeAjax: function(configuration, callback, testResponseUrl) {
             var url = testResponseUrl ? testResponseUrl : this.get('resourceUrl');
+            configuration.data.ajax_timestamp = new Date().getTime();
             Y.io.request(url, {
                 method: configuration.method,
                 data: configuration.data,
@@ -372,30 +475,54 @@ AUI.add('todo-portlet', function (Y, NAME) {
             
             this.addButton.on('click', function (e) {
                 modal.set('width', (me.getViewport().width < LIFERAY_PHONE_MEDIA_BREAK ? (me.getViewport().width - 40) : 500));
+                modal.get('boundingBox').one(SELECT_CALENDAR).setAttribute("disabled", "disabled");
                 modal.show();
             });
 
             modal.get('boundingBox').one('.add-submit').on('click', function (e) {
                 /* trigger validator */
-                modal.get('boundingBox').all('input:not(.edit-time),textarea').each(function(n) {
-                    n.simulate('blur'); 
-                });
-                if (modal.get('boundingBox').all('.error').size() == 0) {
-                    var title = modal.get('boundingBox').one('.add-title').get('value');
-                    var description = modal.get('boundingBox').one('.add-description').get('value');
-                    var date = modal.get('boundingBox').one('.lfr-input-date input').get('value');
+                var title = modal.get('boundingBox').one('.add-title').get('value');
+                var description = modal.get('boundingBox').one('.add-description').get('value');
+                var date = modal.get('boundingBox').one('.lfr-input-date input').get('value');
+                var calendarId = me.getCalendarId(modal.get('boundingBox').one(SELECT_CALENDAR));
+                var firstReminderValue = me.getReminderValue(modal.get('boundingBox').one(FIRST_REMINDER_VALUE));
+                var firstReminderDuration = me.getReminderValue(modal.get('boundingBox').one(FIRST_REMINDER_DURATION));
+                var secondReminderValue = me.getReminderValue(modal.get('boundingBox').one(SECOND_REMINDER_VALUE));
+                var secondReminderDuration = me.getReminderValue(modal.get('boundingBox').one(SECOND_REMINDER_DURATION));
+                
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (modal.get('boundingBox').all('.error').size() == 0 && Y.Lang.trim(title) != '' && 
+                        Y.Lang.trim(description) != '' && Y.Lang.trim(date) != '') {
                     date = new Date(date);
+                    date.setHours(0,0,0,0); //starts at midnight
                     modal.get('boundingBox').one('.todo-portlet-loader').toggleClass('visible');
-                    me.addTaskCall({name: title, description: description, day: (date.getDate() + 1), month: date.getMonth(), year: date.getFullYear()}, function(data) {
-                        modal.get('boundingBox').one('.todo-portlet-loader').toggleClass('visible');
-                        me.updateTaskListUI(function() {
+                    modal.get('boundingBox').one('.add-submit').setAttribute('disabled', 'true');
+                    me.addTaskCall(
+                		{
+                			name: title, 
+                			description: description, 
+                			day: (date.getDate() + 1), 
+                			month: date.getMonth(), 
+                			year: date.getFullYear(), 
+                			calendarId: calendarId,
+                			firstReminderType: 'email',
+                			firstReminderDuration: firstReminderDuration,
+                			firstReminderValue: firstReminderValue,
+                			secondReminderType: 'email',
+                			secondReminderDuration: secondReminderDuration,
+                			secondReminderValue: secondReminderValue,
+                		},  function(data) {
+	                        modal.get('boundingBox').one('.todo-portlet-loader').toggleClass('visible');
+	                        modal.get('boundingBox').one('.add-submit').removeAttribute('disabled');
+	                        me.updateTaskListUI(function() {
                             me.openTaskGroup(data.taskId);
                         });
                         modal.get('boundingBox').one('form').reset();
                         modal.hide();
                     });
-                    e.preventDefault();
-                    e.stopPropagation();
+                    
                 }
             });
 
@@ -413,6 +540,54 @@ AUI.add('todo-portlet', function (Y, NAME) {
             		popover.hide();
             	}
             });
+            
+            // Add to calendar checkbox on modal
+            modal.get('boundingBox').one(CHECKBOX_CALENDAR).on('change', function (event) {
+            	me.checkCalendarHandler(event, modal.get('boundingBox').one(SELECT_CALENDAR));
+            	// toggling the reminders div when checking or unchecking the add to liferay calendar checkbox
+            	modal.get('boundingBox').one(REMINDERS_BOX).toggleClass(REMINDERS_HIDDEN_CLASS);
+            });
+            
+            // Add reminder checkbox on modal
+            modal.get('boundingBox').all(CHECKBOX_REMINDER).on('change', function (event) {
+            	// get the reminder parent div
+            	var reminderDiv = event.target.ancestor(REMINDER_BOX);
+            	// using the reminder div, get the input for the reminder value and the select for the reminder duration
+            	me.checkReminderHandler(event, reminderDiv.one(REMINDER_VALUE), reminderDiv.one(REMINDER_DURATION));
+            });
+            
+            // Initialy the reminders controls are disabled
+            modal.get('boundingBox').all(REMINDER_VALUE).setAttribute('disabled', 'disabled');
+            modal.get('boundingBox').all(REMINDER_DURATION).setAttribute('disabled', 'disabled');
+        },
+        
+        /** Handler for the checkbox to enable or disabled the calendar select **/
+        checkCalendarHandler: function (event, selectCalendar) {
+        	if (selectCalendar) {
+        		if (selectCalendar.attr("disabled")) {
+	        		selectCalendar.removeAttribute("disabled");
+	        	} else {
+	        		selectCalendar.setAttribute("disabled", "disabled");
+	        	}
+        	}
+        },
+        
+        checkReminderHandler: function (event, inputReminder, selectReminder) {
+        	if (inputReminder && selectReminder) {
+        		// toggle the disabled attribute for the input
+        		if (inputReminder.attr("disabled")) {
+        			inputReminder.removeAttribute("disabled");
+        		} else {
+        			inputReminder.setAttribute("disabled", "disabled");
+        		}
+        		
+        		// toggle the disabled attribute for the select
+        		if (selectReminder.attr("disabled")) {
+        			selectReminder.removeAttribute("disabled");
+        		} else {
+        			selectReminder.setAttribute("disabled", "disabled");
+        		}
+        	}
         },
         
         openTaskGroup: function(taskId) {
@@ -439,18 +614,22 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     easing: 'cubic-bezier(0, 0.1, 0, 1)'
                 }
             });
+            
+            
         },
 
 
         /** Returns the different members of a single task
     @element Must be a li containing a task **/
         getMembers: function (element) {
-            var activity = element.one(".activity");
-            edit = element.one(".edit");
-            title = activity.one(".activity-title");
-            time = activity.one(".activity-time");
-            titleInput = edit.one(".edit-title");
-            timeInput = edit.one(".edit-time");
+            var activity = element.one(".activity"),
+            edit = element.one(".edit"),
+            title = activity.one(".activity-title"),
+            time = activity.one(".activity-time"),
+            titleInput = edit.one(".edit-title"),
+            timeInput = edit.one(".edit-time"),
+            selectCalendar = edit.one(SELECT_CALENDAR);
+            
 
             return {
                 li: element,
@@ -459,7 +638,8 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 title: title,
                 time: time,
                 titleInput: titleInput,
-                timeInput: timeInput
+                timeInput: timeInput,
+                selectCalendar: selectCalendar
             };
         }
 
