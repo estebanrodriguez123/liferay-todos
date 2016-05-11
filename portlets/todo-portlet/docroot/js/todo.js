@@ -214,9 +214,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
             this.activities.each(function (activity) {
                 activity.on("click", function () {
                     var element = me.getMembers(this.get("parentNode"));
-                    element.activity.addClass("hide");
-                    element.edit.addClass("show");
-                    
+                    me.fire('activityOpened', element);
                     //element.titleInput.set("value",element.title.get("text"));
                     //element.timeInput.set("value",element.time.get("text"));
                 });
@@ -310,12 +308,19 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     e.preventDefault();
                     e.stopPropagation();
                     var element = me.getMembers(this.get("parentNode").get("parentNode").get("parentNode"));
-
-                    element.activity.addClass("show").removeClass("hide");
-                    element.edit.addClass("hide").removeClass("show");
+                    me.closeActivity(element);
                 });
             });
-
+            
+            this.on('activityOpened', function(e) {
+                box.all(".tasks li").each(function() {
+                    var element = me.getMembers(this);
+                    me.closeActivity(element);
+                });
+                e.activity.addClass("hide");
+                e.edit.addClass("show");
+            });
+            
             /** Sets the function that marks an activity as finished when clicking on the check mark **/
             this.done.each(function (button) {
                 button.on("click", function (e) {
@@ -341,6 +346,11 @@ AUI.add('todo-portlet', function (Y, NAME) {
                     e.stopPropagation();
                 });
             });
+        },
+        
+        closeActivity: function(element) {
+            element.activity.addClass("show").removeClass("hide");
+            element.edit.addClass("hide").removeClass("show");
         },
         
         getCalendarId: function(select) {
