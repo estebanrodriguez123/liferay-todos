@@ -24,16 +24,19 @@
 <%@page import="com.liferay.portal.theme.ThemeDisplay" %>
 <%@page import="com.liferay.portal.kernel.util.HtmlUtil" %>
 <%@page import="com.rivetlogic.portlet.todo.bean.TasksBean" %>
-
+<%@page import="com.rivetlogic.portlet.todo.util.CalendarResourceUtil" %>
+<%@page import="com.liferay.calendar.model.CalendarResource" %>
+<%@page import="com.liferay.portal.kernel.util.OrderByComparator" %>
 <%
 Calendar defaultValueDate = CalendarFactoryUtil.getCalendar();
 defaultValueDate.setTime(new Date());
 
+CalendarResource userCalendarResource = CalendarResourceUtil.getUserCalendarResource(liferayPortletRequest, themeDisplay.getUserId());
+
 List<com.liferay.calendar.model.Calendar> manageableCalendars = CalendarServiceUtil.search(
-		themeDisplay.getCompanyId(), null, null, null, true,
-		QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-		new CalendarNameComparator(true),
-		TasksBean.ACTION_KEY_MANAGE_BOOKINGS);
+		themeDisplay.getCompanyId(),
+		null, new long[] {userCalendarResource.getCalendarResourceId()}, 
+		null, true, QueryUtil.ALL_POS, QueryUtil.ALL_POS, (OrderByComparator)null);
 %>
 
 <script id="<portlet:namespace/>add-task-template" type="text/x-html-template">
