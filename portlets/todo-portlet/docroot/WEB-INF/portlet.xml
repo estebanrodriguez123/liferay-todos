@@ -13,6 +13,10 @@
 			<name>help-template</name>
 			<value>/html/help.jsp</value>
 		</init-param>
+		<init-param>
+			<name>config-template</name>
+			<value>/html/preferences.jsp</value>
+		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
 			<mime-type>text/html</mime-type>

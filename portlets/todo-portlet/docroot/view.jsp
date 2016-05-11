@@ -29,6 +29,8 @@
 <%@ page import="com.liferay.portal.kernel.servlet.BrowserSnifferUtil" %>
 <%@ page import="com.liferay.portal.kernel.util.StringPool" %>
 <%@ page import="com.liferay.portal.kernel.util.WebKeys" %>
+<%@ page import="com.liferay.portal.kernel.util.GetterUtil"%>
+<%@ page import="com.rivetlogic.portlet.todo.util.Constants" %>
 
 <portlet:defineObjects />
 <liferay-theme:defineObjects />
@@ -41,8 +43,9 @@
     String calendarAlloyModule = "aui-datepicker" + (BrowserSnifferUtil.isMobile(request) ? "-native" : StringPool.BLANK);
     String calendarAlloyClass = "A.DatePicker" + (BrowserSnifferUtil.isMobile(request) ? "Native" : StringPool.BLANK);
     String isMobile = (BrowserSnifferUtil.isMobile(request) ? "true" : "false");
+    boolean enableLRCalendarIntegration = GetterUtil.getBoolean(portletPreferences.getValue(Constants.ENABLE_LR_CALENDAR_INTEGRATION, "false"));
     %>
-    
+      
     <script type="text/javascript">
         AUI().ready('todo-portlet','<%=calendarAlloyModule %>', function(A) {
             var todo = new A.Todo({

@@ -181,7 +181,7 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 me._createCalendar('#' + node.one('.edit-time').get('id'));
                 
                 // only disable the select when the task was not added to the liferay calendar
-                if (!node.one(CHECKBOX_CALENDAR).attr("checked")) {
+                if (node.one(CHECKBOX_CALENDAR) && !node.one(CHECKBOX_CALENDAR).attr("checked")) {
                 	node.one(SELECT_CALENDAR).setAttribute("disabled", "disabled");
                 	// if select is disabled, hide the reminders container
                 	node.one(REMINDERS_BOX).addClass(REMINDERS_HIDDEN_CLASS);
@@ -198,6 +198,10 @@ AUI.add('todo-portlet', function (Y, NAME) {
                 	}
                 });
                 
+                /* check if LR calendar integration enabled from config */
+                if (!node.one(CHECKBOX_CALENDAR)) {
+                  return;
+                }
                 // Add to calendar checkbox on edit
                 node.one(CHECKBOX_CALENDAR).on('change', function (event) { 
                 	me.checkCalendarHandler(event, node.one(SELECT_CALENDAR));
@@ -354,14 +358,23 @@ AUI.add('todo-portlet', function (Y, NAME) {
         },
         
         getCalendarId: function(select) {
+          if (!select) {
+              return UNDEFINED_CALENDAR_ID;
+          }
         	return select.attr("disabled")? UNDEFINED_CALENDAR_ID : select.val();
         },
         
         getReminderValue: function(inputReminder) {
+          if (!inputReminder) {
+            return 0;
+          }
         	return inputReminder.attr("disabled")? 0: inputReminder.val();
         },
         
         getReminderDuration: function(selectReminder) {
+          if (!selectReminder) {
+            return 0;
+          }
         	return selectReminder.attr("disabled")? 0: selectReminder.val();
         },
         
@@ -485,7 +498,9 @@ AUI.add('todo-portlet', function (Y, NAME) {
             
             this.addButton.on('click', function (e) {
                 modal.set('width', (me.getViewport().width < LIFERAY_PHONE_MEDIA_BREAK ? (me.getViewport().width - 40) : 500));
-                modal.get('boundingBox').one(SELECT_CALENDAR).setAttribute("disabled", "disabled");
+                if (modal.get('boundingBox').one(SELECT_CALENDAR)) {
+                    modal.get('boundingBox').one(SELECT_CALENDAR).setAttribute("disabled", "disabled");
+                }
                 modal.show();
             });
 
@@ -550,6 +565,11 @@ AUI.add('todo-portlet', function (Y, NAME) {
             		popover.hide();
             	}
             });
+            
+            /* check if LR calendar integration configured */
+            if (!modal.get('boundingBox').one('.add-to-calendar')) {
+              return;
+            }
             
             // Add to calendar checkbox on modal
             modal.get('boundingBox').one(CHECKBOX_CALENDAR).on('change', function (event) {
