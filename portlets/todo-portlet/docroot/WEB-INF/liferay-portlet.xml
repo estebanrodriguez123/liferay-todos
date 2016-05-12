@@ -5,6 +5,7 @@
 	<portlet>
 		<portlet-name>todo</portlet-name>
 		<icon>/icon.png</icon>
+		<configuration-action-class>com.rivetlogic.portlet.todo.ConfigurationAction</configuration-action-class>
 		<header-portlet-css>/css/main.css</header-portlet-css>
 		<footer-portlet-javascript>/js/todo.js</footer-portlet-javascript>
 		<css-class-wrapper>todo-portlet</css-class-wrapper>

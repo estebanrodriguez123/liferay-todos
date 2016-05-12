@@ -49,50 +49,51 @@
             <div class="control-group">
                 <label class="control-label" for="time"><liferay-ui:message key="edit-task-date" /></label>
                 <div class="lfr-input-date controls">
-                    <input id="taskCal{taskId}" name="time" type="{dateFieldType}" class="edit-time field-required" value="{date}"></input>
+                    <input id="taskCal{taskId}" name="time" type="{dateFieldType}" class="edit-time" value="{date}"></input>
                 </div>
             </div>
+            <%-- LR Calendar Integration --%>
+      			<c:if test="<%=enableLRCalendarIntegration %>">          
+          			<div class="control-group">
+          				<label class="add-to-calendar"><input {checked} type="checkbox" class="chk-calendar" /> <liferay-ui:message key="edit-task-add-to-calendar" /></label>
+                 			<div class="controls">            
+          					<select class="select-calendar">
+          						<%
+          						for (com.liferay.calendar.model.Calendar curCalendar : manageableCalendars) {
+          						%>
+          						<option {<%= curCalendar.getCalendarId() %>} value="<%= curCalendar.getCalendarId() %>"><%= HtmlUtil.escape(curCalendar.getName(locale)) %></option>
+          						<%
+          						}
+          						%>
+          					</select>			
+                  		</div>
+          			</div>
 
-			<div class="control-group">
-				<label class="add-to-calendar"><input {checked} type="checkbox" class="chk-calendar" /> <liferay-ui:message key="edit-task-add-to-calendar" /></label>
-       			<div class="controls">            
-					<select class="select-calendar">
-						<%
-						for (com.liferay.calendar.model.Calendar curCalendar : manageableCalendars) {
-						%>
-						<option {<%= curCalendar.getCalendarId() %>} value="<%= curCalendar.getCalendarId() %>"><%= HtmlUtil.escape(curCalendar.getName(locale)) %></option>
-						<%
-						}
-						%>
-					</select>			
-        		</div>
-			</div>
-
-			<div class="control-group reminders {remindersClass}">
-				<label><liferay-ui:message key="edit-task-reminders" /></label>
-				<div class="reminder">
-					<label class="add-reminder"><input {firstReminderChecked} type="checkbox" class="chk-reminder" /> <liferay-ui:message key="edit-task-reminder-type"/></label> 
-					<input class="reminder-value first-reminder-value" type="text" value="{firstReminderValue}"/>
-					<select class="reminder-duration first-reminder-duration">
-						<option {first60000} value="60000"><liferay-ui:message key="edit-task-reminder-select-first-label"/></option>
-						<option {first3600000} value="3600000"><liferay-ui:message key="edit-task-reminder-select-second-label"/></option>
-						<option {first86400000} value="86400000"><liferay-ui:message key="edit-task-reminder-select-third-label"/></option>
-						<option {first604800000} value="604800000"><liferay-ui:message key="edit-task-reminder-select-fourth-label"/></option>
-					</select>	
-				</div>
-				
-				<div class="reminder">
-					<label class="add-reminder"><input {secondReminderChecked} type="checkbox" class="chk-reminder" /> <liferay-ui:message key="edit-task-reminder-type"/></label> 
-					<input class="reminder-value second-reminder-value" type="text" value="{secondReminderValue}"/>
-					<select class="reminder-duration second-reminder-duration">
-						<option {second60000} value="60000"><liferay-ui:message key="edit-task-reminder-select-first-label"/></option>
-						<option {second3600000} value="3600000"><liferay-ui:message key="edit-task-reminder-select-second-label"/></option>
-						<option {second86400000} value="86400000"><liferay-ui:message key="edit-task-reminder-select-third-label"/></option>
-						<option {second604800000} value="604800000"><liferay-ui:message key="edit-task-reminder-select-fourth-label"/></option>
-					</select>	
-				</div>
-			</div>
-
+          			<div class="control-group reminders {remindersClass}">
+          				<label><liferay-ui:message key="edit-task-reminders" /></label>
+          				<div class="reminder">
+          					<label class="add-reminder"><input {firstReminderChecked} type="checkbox" class="chk-reminder" /> <liferay-ui:message key="edit-task-reminder-type"/></label> 
+          					<input class="reminder-value first-reminder-value" type="text" value="{firstReminderValue}"/>
+          					<select class="reminder-duration first-reminder-duration">
+          						<option {first60000} value="60000"><liferay-ui:message key="edit-task-reminder-select-first-label"/></option>
+          						<option {first3600000} value="3600000"><liferay-ui:message key="edit-task-reminder-select-second-label"/></option>
+          						<option {first86400000} value="86400000"><liferay-ui:message key="edit-task-reminder-select-third-label"/></option>
+          						<option {first604800000} value="604800000"><liferay-ui:message key="edit-task-reminder-select-fourth-label"/></option>
+          					</select>	
+          				</div>
+          				
+          				<div class="reminder">
+          					<label class="add-reminder"><input {secondReminderChecked} type="checkbox" class="chk-reminder" /> <liferay-ui:message key="edit-task-reminder-type"/></label> 
+          					<input class="reminder-value second-reminder-value" type="text" value="{secondReminderValue}"/>
+          					<select class="reminder-duration second-reminder-duration">
+          						<option {second60000} value="60000"><liferay-ui:message key="edit-task-reminder-select-first-label"/></option>
+          						<option {second3600000} value="3600000"><liferay-ui:message key="edit-task-reminder-select-second-label"/></option>
+          						<option {second86400000} value="86400000"><liferay-ui:message key="edit-task-reminder-select-third-label"/></option>
+          						<option {second604800000} value="604800000"><liferay-ui:message key="edit-task-reminder-select-fourth-label"/></option>
+          					</select>	
+          				</div>
+          			</div>
+            </c:if>
        
             <button class="btn edit-submit"><liferay-ui:message key="edit-task-submit" /></button>
             <button class="btn edit-cancel"><liferay-ui:message key="edit-task-cancel" /></button>

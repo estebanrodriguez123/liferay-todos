@@ -33,22 +33,23 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.rivetlogic.portlet.todo.bean.TasksBean;
+import com.rivetlogic.portlet.todo.beans.PreferencesBean;
 import com.rivetlogic.portlet.todo.model.Task;
 import com.rivetlogic.portlet.todo.model.impl.TaskImpl;
 import com.rivetlogic.portlet.todo.service.TaskLocalServiceUtil;
+import com.rivetlogic.portlet.todo.util.Constants;
 import com.rivetlogic.portlet.todo.util.TodoUtil;
 import com.rivetlogic.portlet.todo.validator.TodoValidator;
-
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import javax.portlet.PortletException;
 import javax.portlet.PortletResponse;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -73,6 +74,27 @@ public class TodoPortlet extends MVCPortlet {
     
     private static final int DEFAULT_INT_VALUE = 0;
     
+    @Override
+    public void render(RenderRequest request, RenderResponse response) throws IOException, PortletException {
+        PreferencesBean prefBean = new PreferencesBean(request);
+        request.setAttribute(Constants.PREF_BEAN, prefBean);
+        super.render(request, response);
+    }
+    /**
+    
+    public void savePreferences(ActionRequest request, ActionResponse response) throws ReadOnlyException, ValidatorException, IOException{
+        PreferencesBean prefBean = new PreferencesBean();
+        prefBean.save(request);
+        SessionMessages.add(request, PortalUtil.getPortletId(request) +
+                SessionMessages.KEY_SUFFIX_UPDATED_PREFERENCES);
+        
+        String redirect = getRedirect(request, response);
+
+        if (Validator.isNotNull(redirect)) {
+            response.sendRedirect(redirect);
+        }
+    }
+     */
     @Override
     public void serveResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse) throws IOException,
         PortletException {

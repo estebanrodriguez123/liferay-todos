@@ -24,83 +24,91 @@
 <%@page import="com.liferay.portal.theme.ThemeDisplay" %>
 <%@page import="com.liferay.portal.kernel.util.HtmlUtil" %>
 <%@page import="com.rivetlogic.portlet.todo.bean.TasksBean" %>
-
+<%@page import="com.rivetlogic.portlet.todo.util.CalendarResourceUtil" %>
+<%@page import="com.liferay.calendar.model.CalendarResource" %>
+<%@page import="com.liferay.portal.kernel.util.OrderByComparator" %>
 <%
 Calendar defaultValueDate = CalendarFactoryUtil.getCalendar();
 defaultValueDate.setTime(new Date());
 
+CalendarResource userCalendarResource = CalendarResourceUtil.getUserCalendarResource(liferayPortletRequest, themeDisplay.getUserId());
+
 List<com.liferay.calendar.model.Calendar> manageableCalendars = CalendarServiceUtil.search(
-		themeDisplay.getCompanyId(), null, null, null, true,
-		QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-		new CalendarNameComparator(true),
-		TasksBean.ACTION_KEY_MANAGE_BOOKINGS);
+		themeDisplay.getCompanyId(),
+		null, new long[] {userCalendarResource.getCalendarResourceId()}, 
+		null, true, QueryUtil.ALL_POS, QueryUtil.ALL_POS, (OrderByComparator)null);
 %>
 
 <script id="<portlet:namespace/>add-task-template" type="text/x-html-template">
 <div class="add">
     <form>
 
-    <div class="control-group">
-        <label class="control-label" for="title"><liferay-ui:message key="edit-task-title" /></label>
-        <div class="controls">
-            <input name="title" type="text" class="add-title field-required"></input>
-        </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label" for="description"><liferay-ui:message key="edit-task-description" /></label>
-        <div class="controls">
-            <textarea name="description" class="add-description" placeholder="<liferay-ui:message key="edit-task-description-placeholder" />"></textarea>
-        </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label" for="time"><liferay-ui:message key="edit-task-date" /></label>
-        <div class="lfr-input-date controls">
-            <input name="time" type="{dateFieldType}" class="edit-time"></input>
-        </div>
-    </div>
-
-	<div class="control-group">
-		<label class="add-to-calendar"><input type="checkbox" class="chk-calendar" /> <liferay-ui:message key="edit-task-add-to-calendar" /></label>
-        <div class="controls">            
-			<select class="select-calendar">
-				<%
-				for (com.liferay.calendar.model.Calendar curCalendar : manageableCalendars) {
-				%>
-					<option value="<%= curCalendar.getCalendarId() %>"><%= HtmlUtil.escape(curCalendar.getName(locale)) %></option>
-	
-				<%
-				}
-				%>
-	
-			</select>			
-        </div>
-	</div>
-
-	<div class="control-group reminders reminders-hidden">
-		<label><liferay-ui:message key="edit-task-reminders" /></label>
-		<div class="reminder">
-			<label class="add-reminder"><input type="checkbox" class="chk-reminder" /> <liferay-ui:message key="edit-task-reminder-type"/></label> 
-			<input class="reminder-value first-reminder-value" type="text"/>
-			<select class="reminder-duration first-reminder-duration">
-				<option value="60000"><liferay-ui:message key="edit-task-reminder-select-first-label"/></option>
-				<option value="3600000"><liferay-ui:message key="edit-task-reminder-select-second-label"/></option>
-				<option value="86400000"><liferay-ui:message key="edit-task-reminder-select-third-label"/></option>
-				<option value="604800000"><liferay-ui:message key="edit-task-reminder-select-fourth-label"/></option>
-			</select>	
-		</div>
+	    <div class="control-group">
+	        <label class="control-label" for="title"><liferay-ui:message key="edit-task-title" /></label>
+	        <div class="controls">
+	            <input name="title" type="text" class="add-title field-required"></input>
+	        </div>
+	    </div>
+	    <div class="control-group">
+	        <label class="control-label" for="description"><liferay-ui:message key="edit-task-description" /></label>
+	        <div class="controls">
+	            <textarea name="description" class="add-description" placeholder="<liferay-ui:message key="edit-task-description-placeholder" />"></textarea>
+	        </div>
+	    </div>
+	    <div class="control-group">
+	        <label class="control-label" for="time"><liferay-ui:message key="edit-task-date" /></label>
+	        <div class="lfr-input-date controls">
+	            <input name="time" type="{dateFieldType}" class="edit-time"></input>
+	        </div>
+	    </div>
 		
-		<div class="reminder">
-			<label class="add-reminder"><input type="checkbox" class="chk-reminder" /> <liferay-ui:message key="edit-task-reminder-type"/></label> 
-			<input class="reminder-value second-reminder-value" type="text"/>
-			<select class="reminder-duration second-reminder-duration">
-				<option value="60000"><liferay-ui:message key="edit-task-reminder-select-first-label"/></option>
-				<option value="3600000"><liferay-ui:message key="edit-task-reminder-select-second-label"/></option>
-				<option value="86400000"><liferay-ui:message key="edit-task-reminder-select-third-label"/></option>
-				<option value="604800000"><liferay-ui:message key="edit-task-reminder-select-fourth-label"/></option>
-			</select>	
-		</div>
-	</div>	
-       
+			<%-- LR Calendar Integration --%>
+			<c:if test="<%=enableLRCalendarIntegration %>">
+			
+					<div class="control-group">
+						<label class="add-to-calendar"><input type="checkbox" class="chk-calendar" /> <liferay-ui:message key="edit-task-add-to-calendar" /></label>
+				        <div class="controls">            
+							<select class="select-calendar">
+								<%
+								for (com.liferay.calendar.model.Calendar curCalendar : manageableCalendars) {
+								%>
+									<option value="<%= curCalendar.getCalendarId() %>"><%= HtmlUtil.escape(curCalendar.getName(locale)) %></option>
+					
+								<%
+								}
+								%>
+					
+							</select>			
+				        </div>
+					</div>
+
+					<div class="control-group reminders reminders-hidden">
+						<label><liferay-ui:message key="edit-task-reminders" /></label>
+						<div class="reminder">
+							<label class="add-reminder"><input type="checkbox" class="chk-reminder" /> <liferay-ui:message key="edit-task-reminder-type"/></label> 
+							<input class="reminder-value first-reminder-value" type="text"/>
+							<select class="reminder-duration first-reminder-duration">
+								<option value="60000"><liferay-ui:message key="edit-task-reminder-select-first-label"/></option>
+								<option value="3600000"><liferay-ui:message key="edit-task-reminder-select-second-label"/></option>
+								<option value="86400000"><liferay-ui:message key="edit-task-reminder-select-third-label"/></option>
+								<option value="604800000"><liferay-ui:message key="edit-task-reminder-select-fourth-label"/></option>
+							</select>	
+						</div>
+						
+						<div class="reminder">
+							<label class="add-reminder"><input type="checkbox" class="chk-reminder" /> <liferay-ui:message key="edit-task-reminder-type"/></label> 
+							<input class="reminder-value second-reminder-value" type="text"/>
+							<select class="reminder-duration second-reminder-duration">
+								<option value="60000"><liferay-ui:message key="edit-task-reminder-select-first-label"/></option>
+								<option value="3600000"><liferay-ui:message key="edit-task-reminder-select-second-label"/></option>
+								<option value="86400000"><liferay-ui:message key="edit-task-reminder-select-third-label"/></option>
+								<option value="604800000"><liferay-ui:message key="edit-task-reminder-select-fourth-label"/></option>
+							</select>	
+						</div>
+					</div>	
+		    </c:if>   
+				<%-- end: LR Calendar Integration --%>
+		
         <button class="btn add-submit"><liferay-ui:message key="edit-task-submit" /></button>
         <button class="btn add-cancel"><liferay-ui:message key="edit-task-cancel" /></button>
         <div class="todo-portlet-loader"></div>
