@@ -79,7 +79,8 @@
 }
 
 .todo-portlet .done span {
-    text-decoration: line-through
+    text-decoration: line-through;
+    color: #FFFFFF;
 }
 
 .todo-portlet .activity-undo {
