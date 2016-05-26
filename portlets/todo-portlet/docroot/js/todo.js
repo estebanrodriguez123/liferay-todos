@@ -653,11 +653,13 @@ AUI.add('todo-portlet', function (Y, NAME) {
             
         },
         
+        /*clear inputs and textarea when click cancel or close buttons */
         clearInputs: function (modal) {
              modal.get('boundingBox').all('.control-group').removeClass("error");
              modal.get('boundingBox').all('.control-group').removeClass("success");
              modal.get('boundingBox').all('.control-group input').set('value', '');
              modal.get('boundingBox').all('.control-group textarea').val('');
+             modal.get('boundingBox').all(".help-inline").remove(false);
         },
 
 
