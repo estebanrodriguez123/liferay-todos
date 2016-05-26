@@ -65,7 +65,8 @@ AUI.add('todo-portlet', function (Y, NAME) {
             this.lastY = 0;
             this.setComponents();
             this.setAddTask();
-            this.updateTaskListUI();            
+            this.updateTaskListUI(); 
+            
         },
         
         /**
@@ -552,14 +553,18 @@ AUI.add('todo-portlet', function (Y, NAME) {
             });
 
             modal.get('boundingBox').one('.add-cancel').on('click', function (e) {
+            	e.preventDefault();
+                e.stopPropagation();
                 modal.hide();
+            	me.clearInputs(modal);
             });
             
             /* 
              *  If the modal is closed using the "x" at the corner, 
              *  the datepicker has to be manually hidden 
              */
-            modal.get('boundingBox').one('.close:button').on('click', function (e) {      
+            modal.get('boundingBox').one('.close:button').on('click', function (e) { 
+            	me.clearInputs(modal);
             	var popover = datePicker.getPopover();
             	if (popover.get('visible')) {
             		popover.hide();
@@ -646,6 +651,15 @@ AUI.add('todo-portlet', function (Y, NAME) {
             });
             
             
+        },
+        
+        /*clear inputs and textarea when click cancel or close buttons */
+        clearInputs: function (modal) {
+             modal.get('boundingBox').all('.control-group').removeClass("error");
+             modal.get('boundingBox').all('.control-group').removeClass("success");
+             modal.get('boundingBox').all('.control-group input').set('value', '');
+             modal.get('boundingBox').all('.control-group textarea').val('');
+             modal.get('boundingBox').all(".help-inline").remove(false);
         },
 
 
